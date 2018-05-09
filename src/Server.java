@@ -1,3 +1,4 @@
+import java.util.*;
 
 public class Server 
 {
@@ -7,11 +8,15 @@ public class Server
 	double[] weight;
 	double alpha;
 	
+	// for Random
+	double[] used;
+	
 	public Server(double[] c)
 	{
 		setCapacity(c);
 		setWeight(1);
 		setAlpha(1);
+		setUsed();
 	}
 	public void setCapacity(double[] c)
 	{
@@ -41,6 +46,26 @@ public class Server
 		}
 		Function.mergeSort(p,index);
 		for(int i = 0; i < u.length; i++)
+		{
+			preference[i] = (int)index[i];
+		}
+		
+	}
+	public void setPreference(List<UE> ueList)
+	{
+		double[] p = new double[ueList.size()];
+		preference = new int[ueList.size()];
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			p[i] = preferenceFunction(weight, ueList.get(i).getDemand(), capacity, alpha);
+		}
+		double[] index = new double[ueList.size()];
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			index[i] = i;
+		}
+		Function.mergeSort(p, index);
+		for(int i = 0; i < ueList.size(); i++)
 		{
 			preference[i] = (int)index[i];
 		}
@@ -78,5 +103,39 @@ public class Server
 	public double getAlpha()
 	{
 		return alpha;
+	}
+	
+	//For Random
+	public void setUsed()
+	{
+		used = new double[getCapacity().length];
+		for(int i = 0; i < used.length; i++)
+		{
+			used[i] = 0;
+		}
+	}
+	public void setUsed(double[] demand)
+	{
+		for(int i = 0; i < demand.length; i++)
+		{
+			used[i] += demand[i];
+		}
+	}
+	public double[] getUsed()
+	{
+		return used;
+	}
+	public boolean checkWhetherExceedCapacity(double[] demand)
+	{
+		boolean result = false;
+		for(int i = 0; i < demand.length; i++)
+		{
+			if(used[i]+demand[i]>capacity[i])
+			{
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 }

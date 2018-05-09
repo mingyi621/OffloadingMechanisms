@@ -2,9 +2,9 @@
 public class UE 
 {
 	double[] demand;
-	double[] latency;
 	double maxLatency;
 	
+	double[] latency;
 	int[] preference;
 	int proposeTo = -1;
 	int preferenceCount = -1;
@@ -75,6 +75,10 @@ public class UE
 		else
 			proposeTo = -1;
 		setAccept(false);
+	}
+	public void setProposeTo(int p)
+	{
+		proposeTo = p;
 	}
 	public int getProposeTo()
 	{
