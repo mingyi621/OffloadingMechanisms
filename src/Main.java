@@ -10,20 +10,21 @@ public class Main {
 
 	public static void main(String[] args) throws IOException
 	{
+		// Basic input settings.
 		int UE = 100;
 		int server = 10;
 		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE1.csv";
 		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server1.csv";
 		String inputLatencyPath = "input/" + "latency/" + "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" + "latency1.csv";
 		
+		// Output settings.
 		String outputDirectory = "output/" +  "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" ;
-		String outputFile = "output1.csv";
-		
+		String outputFile = "output1.csv";		
 		File outputDir = new File(outputDirectory);
-	    if (!outputDir.exists())	outputDir.mkdir();
-	    
+	    if (!outputDir.exists())	outputDir.mkdir();	    
 	    String outputPath = outputDirectory + outputFile;
 		
+	    // Read UE and server files.
 		List<UE> ueList = ReadUE(inputUEPath);
 		List<Server> serverList = ReadServer(inputServerPath);
 		
@@ -45,22 +46,32 @@ public class Main {
 		for(int i = 0; i < ueList.size(); i++)
 		{
 			ueList.get(i).setPreference();
+			System.out.printf("Preference list of UE %d: ",i);
+			ueList.get(i).showPreference();
 		}
+		
 		
 		// 3. Set Servers' Preference List
 		for(int i = 0; i < serverList.size(); i++)
 		{
 			serverList.get(i).setPreference(ueList);
+			System.out.printf("Preference list of server %d: ",i);
+			serverList.get(i).showPreference();
 		}
 		
 		// 4&5. Deferred Acceptance Algorithm
 		deferredAcceptanceAlgorithm(ueList, serverList);
 		
 		// Random Algorithm
-//		RandomAlgorithm(ueList,serverList);
+		RandomAlgorithm(ueList,serverList);
 		
 		// Write To File
-		WriteToFile(ueList, serverList, outputPath);	
+		WriteToFile(ueList, serverList, outputPath);
+		
+		// Performance evaluation.
+		PerformanceEvaluation.sumOfPreference(ueList, serverList);
+		PerformanceEvaluation.balanceIndex(ueList, serverList);
+		PerformanceEvaluation.averageLatency(ueList, serverList);
 	}
 	
 	public static List<UE> ReadUE(String file) throws IOException
@@ -132,20 +143,25 @@ public class Main {
 				for(int j = 0; j < used.length; j++)
 				{
 					used[j] = 0;
+					serverList.get(i).setUsed();
 				}
+				boolean accept = true;
 				for(int j = 0; j < ueList.size(); j++)
 				{
 					if(ueList.get(serverList.get(i).getPreference()[j]).getProposeTo() == i)
 					{
-						System.out.printf("algo: UE %d proposed to %d.\n", serverList.get(i).getPreference()[j], i);
-						boolean accept = true;
-						for(int k = 0; k < serverList.get(i).getCapacity().length; k++)
+						System.out.printf("algo: Server %d got propose from UE %d. ", i, serverList.get(i).getPreference()[j]);
+						if(accept)
 						{
-							if(used[k] + ueList.get(serverList.get(i).getPreference()[j]).getDemand()[k] > serverList.get(i).getCapacity()[k])
+							for(int k = 0; k < serverList.get(i).getCapacity().length; k++)
 							{
-								accept = false;
-								globalRejection = true;
-								break;
+								if(used[k] + ueList.get(serverList.get(i).getPreference()[j]).getDemand()[k] > serverList.get(i).getCapacity()[k])
+								{
+									accept = false;
+									globalRejection = true;
+									System.out.println("\n The capacity is full.");
+									break;
+								}
 							}
 						}
 						if(accept)
@@ -154,6 +170,7 @@ public class Main {
 							{
 								used[k] += ueList.get(serverList.get(i).getPreference()[j]).getDemand()[k];
 							}
+							serverList.get(i).setUsed(ueList.get(serverList.get(i).getPreference()[j]).getDemand());
 							ueList.get(serverList.get(i).getPreference()[j]).setAccept(true);
 							System.out.printf("UE %d is accepted by server %d.\n", serverList.get(i).getPreference()[j], i);
 						}
@@ -161,7 +178,6 @@ public class Main {
 						{
 							ueList.get(serverList.get(i).getPreference()[j]).setAccept(false);
 							System.out.printf("UE %d is rejected by server %d.\n", serverList.get(i).getPreference()[j], i);
-							break;
 						}		
 					}
 				}
@@ -183,8 +199,8 @@ public class Main {
 				triedServer[j] = false;
 			}
 			do{
-				count++;
-				if(count == serverList.size() + 1)
+				count++; // the number of tries.
+				if(count == serverList.size() + 1) // if tries exceed the number of servers
 					break;
 				while(true)
 				{	
@@ -196,8 +212,9 @@ public class Main {
 					System.out.printf("UE %d propose to server %d.\n", i, server);
 					break;
 				}
-				
-				if(ueList.get(i).getLatency()[ueList.get(i).getProposeTo()] > ueList.get(i).getMaximumLatency())// do not satisfy latency
+				int c = ueList.get(i).checkTheCount(server);
+				System.out.printf("c = %d\n", c);
+				if(c <= ueList.get(i).getLatency().length && ueList.get(i).getLatency()[c-1] > ueList.get(i).getMaximumLatency())// do not satisfy latency
 				{
 					System.out.printf("Do not satisfy latency.\n");
 					continue;
@@ -207,15 +224,20 @@ public class Main {
 					serverList.get(server).setUsed(ueList.get(i).getDemand());	
 					ueList.get(i).setAccept(true);
 					System.out.println("Accepted.");
+					ueList.get(i).setPreferenceCount(c);
 					break;
 				}
 				else
 				{
 					System.out.println("Exceed Capacity.");
 				}
-			}while(count <= serverList.size()); // not to exceed # servers tries	
+			}while(count <= serverList.size()); // not to exceed # servers tries
 			if(count == serverList.size() + 1)
+			{	
 				ueList.get(i).setProposeTo(-1);
+				int c = ueList.get(i).checkTheCount(-1);
+				ueList.get(i).setPreferenceCount(c);
+			}
 		}
 	}
 	public static void WriteToFile(List<UE> ueList, List<Server> serverList, String outputFile) throws IOException

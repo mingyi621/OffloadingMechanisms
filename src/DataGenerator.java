@@ -13,9 +13,9 @@ public class DataGenerator
 	{
 		// Basic environment settings.
 		int UE = 100;
-		int server = 10;
+		int server = 5;
 		double percentage = 0.6; // the percentage of UEs have latency constraint.
-		int[] maxLatencyRange = {0,100};
+		int[] maxLatencyRange = {1,100};
 		double[] area = {100, 100};
 
 		// File Path settings.
@@ -39,8 +39,7 @@ public class DataGenerator
 		
 		// Process UE files.
 		List<double[]> requestList = generateRequest(UE);
-		List<int[]> maxLatencyList = generateMaxLatency(UE, percentage, maxLatencyRange, area);
-		
+		List<int[]> maxLatencyList = generateMaxLatency(UE, percentage, maxLatencyRange, area);	
 		writeToUEFile(outputUEPath, requestList, maxLatencyList);	
 		
 		// Process server files.

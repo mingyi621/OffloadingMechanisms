@@ -138,4 +138,12 @@ public class Server
 		}
 		return result;
 	}
+	public void showPreference()
+	{
+		for(int i = 0; i < getPreference().length; i++)
+		{
+			System.out.printf("%d ", getPreference()[i]);
+		}
+		System.out.println();
+	}
 }

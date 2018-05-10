@@ -47,6 +47,14 @@ public class UE
 	{
 		return latency;
 	}
+	public void showLatency()
+	{
+		for(int i = 0; i < getLatency().length; i++)
+		{
+			System.out.printf("%.0f ", getLatency()[i]);
+		}
+		System.out.println();
+	}
 	public void setPreference()
 	{
 		preference = new int[getLatency().length];
@@ -92,6 +100,10 @@ public class UE
 	{
 		return preferenceCount;
 	}
+	public void showPreferenceCount()
+	{
+		System.out.printf(" %d", getPreferenceCount());
+	}
 	public void setAccept(boolean a)
 	{
 		accept = a;
@@ -99,5 +111,29 @@ public class UE
 	public boolean getAccept()
 	{
 		return accept;
+	}
+	public void showAccept()
+	{
+		System.out.print(getAccept() ? " 1" : " 0");
+	}
+	public int checkTheCount(int server)
+	{
+		int count = 1;
+		for(int i = 0; i < getPreference().length; i++)
+		{
+			if(getPreference()[i] == server || getPreference()[i] == -1)
+				break;
+			else
+				count++;
+		}
+		return count;
+	}
+	public void showPreference()
+	{
+		for(int i = 0; i < getPreference().length; i++)
+		{
+			System.out.printf("%d ", getPreference()[i]);
+		}
+		System.out.println();
 	}
 }
