@@ -11,6 +11,8 @@ public class Server
 	// for Random
 	double[] used;
 	
+	List<UE> servedUEList = new ArrayList<>();
+	
 	public Server(double[] c)
 	{
 		setCapacity(c);
@@ -145,5 +147,13 @@ public class Server
 			System.out.printf("%d ", getPreference()[i]);
 		}
 		System.out.println();
+	}
+	public void addServedUEList(UE ue)
+	{
+		servedUEList.add(ue);
+	}
+	public List<UE> getServedUEList()
+	{
+		return servedUEList;
 	}
 }

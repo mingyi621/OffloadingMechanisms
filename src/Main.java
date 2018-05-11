@@ -60,10 +60,13 @@ public class Main {
 		}
 		
 		// 4&5. Deferred Acceptance Algorithm
-		deferredAcceptanceAlgorithm(ueList, serverList);
+//		deferredAcceptanceAlgorithm(ueList, serverList);
 		
 		// Random Algorithm
-		RandomAlgorithm(ueList,serverList);
+//		RandomAlgorithm(ueList, serverList);
+		
+		// Boston Mechanism
+		BostonMechanism(ueList, serverList);
 		
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
@@ -72,6 +75,7 @@ public class Main {
 		PerformanceEvaluation.sumOfPreference(ueList, serverList);
 		PerformanceEvaluation.balanceIndex(ueList, serverList);
 		PerformanceEvaluation.averageLatency(ueList, serverList);
+		PerformanceEvaluation.avergeServedUEs(ueList, serverList);
 	}
 	
 	public static List<UE> ReadUE(String file) throws IOException
@@ -183,6 +187,21 @@ public class Main {
 				}
 			}
 		}while(globalRejection);
+		
+		// Set each server's servedUEList.
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			System.out.printf("Server %d accepted UE ", i);
+			for(int j = 0; j < ueList.size(); j++)
+			{
+				if(ueList.get(j).getAccept() == true && ueList.get(j).getProposeTo() == i)
+				{
+					serverList.get(i).addServedUEList(ueList.get(j));
+					System.out.printf("%d ", j);
+				}
+			}
+			System.out.println();
+		}
 	}
 	public static void RandomAlgorithm(List<UE> ueList, List<Server> serverList)
 	{
@@ -239,6 +258,72 @@ public class Main {
 				ueList.get(i).setPreferenceCount(c);
 			}
 		}
+		// Set each server's servedUEList.
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			System.out.printf("Server %d accepted UE ", i);
+			for(int j = 0; j < ueList.size(); j++)
+			{
+				if(ueList.get(j).getAccept() == true && ueList.get(j).getProposeTo() == i)
+				{
+					serverList.get(i).addServedUEList(ueList.get(j));
+					System.out.printf("%d ", j);
+				}
+			}
+			System.out.println();
+		}
+	}
+	public static void BostonMechanism(List<UE> ueList, List<Server> serverList)
+	{
+		boolean globalRejection;
+		boolean continueIndicator;
+		do{
+			globalRejection = false;
+			continueIndicator = false;
+			// Each UE propose to the first server in its preference list
+			for(int i = 0; i < ueList.size(); i++)
+			{
+				if(ueList.get(i).getAccept() == false)
+				{
+					ueList.get(i).setProposeTo();
+					System.out.printf("UE %d propose to server %d.\n", i, ueList.get(i).getProposeTo());
+					if(ueList.get(i).getProposeTo() != -1)
+					{
+						continueIndicator = true;
+					}
+				}
+			}
+			if(!continueIndicator)
+				break;
+		
+			for(int i = 0; i < serverList.size(); i++)
+			{
+				for(int j = 0; j < serverList.get(i).getPreference().length; j++)
+				{
+					// If UE j is not accepted and propose to server i 
+					if(ueList.get(serverList.get(i).getPreference()[j]).getAccept() == false 
+							&& ueList.get(serverList.get(i).getPreference()[j]).getProposeTo() == i	)
+					{
+						int proposeUE = serverList.get(i).getPreference()[j];
+						System.out.printf("Server %d got propose from UE %d.\n", i, proposeUE);
+						// If the proposed UE's demand still not exceed server i's capacity
+						if(serverList.get(i).checkWhetherExceedCapacity(ueList.get(proposeUE).getDemand()) == false)
+						{
+							System.out.printf("UE %d got accepted.\n", proposeUE);
+							ueList.get(proposeUE).setAccept(true);
+							serverList.get(i).setUsed(ueList.get(proposeUE).getDemand());
+							serverList.get(i).addServedUEList(ueList.get(proposeUE));
+						}
+						else
+						{
+							globalRejection = true;
+							System.out.printf("UE %d got rejected. Exceed the capacity.\n", proposeUE);
+							
+						}
+					}
+				}
+			}
+		}while(globalRejection);
 	}
 	public static void WriteToFile(List<UE> ueList, List<Server> serverList, String outputFile) throws IOException
 	{

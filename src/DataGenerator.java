@@ -12,8 +12,8 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 		// Basic environment settings.
-		int UE = 100;
-		int server = 5;
+		int UE = 40;
+		int server = 4;
 		double percentage = 0.6; // the percentage of UEs have latency constraint.
 		int[] maxLatencyRange = {1,100};
 		double[] area = {100, 100};
