@@ -60,13 +60,13 @@ public class Main {
 		}
 		
 		// 4&5. Deferred Acceptance Algorithm
-//		deferredAcceptanceAlgorithm(ueList, serverList);
+		deferredAcceptanceAlgorithm(ueList, serverList);
 		
 		// Random Algorithm
 //		RandomAlgorithm(ueList, serverList);
 		
 		// Boston Mechanism
-		BostonMechanism(ueList, serverList);
+//		BostonMechanism(ueList, serverList);
 		
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
@@ -76,6 +76,7 @@ public class Main {
 		PerformanceEvaluation.balanceIndex(ueList, serverList);
 		PerformanceEvaluation.averageLatency(ueList, serverList);
 		PerformanceEvaluation.avergeServedUEs(ueList, serverList);
+		PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
 	}
 	
 	public static List<UE> ReadUE(String file) throws IOException

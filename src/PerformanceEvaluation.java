@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class PerformanceEvaluation 
@@ -86,5 +87,21 @@ public class PerformanceEvaluation
 		result = count / serverList.size();
 		System.out.printf("Count = %.0f, serverListSize = %d, Average served UE = %.2f\n", count, serverList.size(), result);
 		return result;
+	}
+	public static double standardDeviationOfServedLatency(List<UE> ueList, List<Server> serverList)
+	{
+		double result = 0;
+		List<Double> latency = new ArrayList<>();
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept()) // If UE i is accepted by some server.
+			{
+				latency.add( ueList.get(i).getLatency()[ueList.get(i).getPreferenceCount()] );
+			}
+		}
+		double sd = Function.calculateSD(latency);
+		System.out.printf("Standard Deviation = %.2f\n", sd);
+		return sd;
+		
 	}
 }

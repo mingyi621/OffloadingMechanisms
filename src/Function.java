@@ -1,3 +1,4 @@
+import java.util.List;
 
 public class Function 
 {
@@ -77,4 +78,22 @@ public class Function
 		return mix;
 	}
 
+	// calculate standard deviation
+	public static double calculateSD(List<Double> array)
+	{
+		double total = 0;
+		double mean = 0;
+		double numerator = 0;
+		for(int i = 0; i < array.size(); i++)
+		{
+			total = total + array.get(i).doubleValue();
+		}
+		mean = total / array.size();
+		
+		for(int i = 0; i < array.size(); i++)
+		{
+			numerator = numerator + Math.pow((array.get(i).doubleValue() - mean), 2);
+		}
+		return Math.sqrt(numerator / (array.size()));	
+	}
 }
