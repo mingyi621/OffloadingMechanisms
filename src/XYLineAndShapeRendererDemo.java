@@ -49,7 +49,7 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(null);
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(1000, 1000));
+        chartPanel.setPreferredSize(new java.awt.Dimension(800, 800));
         setContentPane(chartPanel);
 
     }

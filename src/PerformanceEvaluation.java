@@ -3,7 +3,7 @@ import java.util.List;
 
 public class PerformanceEvaluation 
 {
-	public static double sumOfPreference(List<UE> ueList, List<Server> serverList)
+	public static double averageOfPreference(List<UE> ueList, List<Server> serverList)
 	{
 		double result = 0;
 		int count = 0;
@@ -11,8 +11,20 @@ public class PerformanceEvaluation
 		{
 			count = count + (ueList.get(i).getPreferenceCount() + 1);
 		}
+		System.out.println("Sum of preference = " + count);
 		result = (double)count/ueList.size();
-		System.out.println("Sum of preference = " + result);
+		System.out.println("Average of preference = " + result);
+		return result;
+	}
+	public static double standardDeviationOfPreference(List<UE> ueList, List<Server> serverList)
+	{
+		List<Double> array = new ArrayList<>();
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			array.add((double)ueList.get(i).getPreferenceCount());
+		}
+		double result = Function.calculateSD(array);
+		System.out.printf("SD of preference = %.2f\n", result);
 		return result;
 	}
 	public static double balanceIndex(List<UE> ueList, List<Server> serverList)
@@ -72,7 +84,7 @@ public class PerformanceEvaluation
 		}
 		
 		double result = overallLatency / acceptedUECount;
-		System.out.printf("overall latency = %.0f, count = %d, result = %.2f\n", overallLatency, acceptedUECount, result);
+		System.out.printf("overall latency = %.0f, count = %d, average latency = %.2f\n", overallLatency, acceptedUECount, result);
 		return result;
 	}
 	public static double avergeServedUEs(List<UE> ueList, List<Server> serverList)
@@ -100,8 +112,25 @@ public class PerformanceEvaluation
 			}
 		}
 		double sd = Function.calculateSD(latency);
-		System.out.printf("Standard Deviation = %.2f\n", sd);
+		System.out.printf("SD of served latency = %.2f\n", sd);
 		return sd;
 		
+	}
+	public static double percentageOfOutsourcing(List<UE> ueList, List<Server> serverList)
+	{
+		double numerator = 0;
+		double denominator = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+				denominator++;
+			if(ueList.get(i).getAccept() && ueList.get(i).getPreferenceCount() != 0)
+				numerator++;
+		}
+		double result = numerator/denominator;
+		System.out.printf("Number of outsourcing requests = %.0f\n"
+				+ "Number of served request = %.0f\n"
+				+ "Percentage of outsourcing = %.2f", denominator, numerator, result);
+		return result;
 	}
 }

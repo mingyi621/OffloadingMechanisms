@@ -11,7 +11,7 @@ public class Main {
 	public static void main(String[] args) throws IOException
 	{
 		// Basic input settings.
-		int UE = 100;
+		int UE = 40;
 		int server = 4;
 		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE1.csv";
 		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server1.csv";
@@ -75,11 +75,13 @@ public class Main {
 		WriteToFile(ueList, serverList, outputPath);
 		
 		// Performance evaluation.
-		PerformanceEvaluation.sumOfPreference(ueList, serverList);
+		PerformanceEvaluation.averageOfPreference(ueList, serverList);
+		PerformanceEvaluation.standardDeviationOfPreference(ueList, serverList);
 		PerformanceEvaluation.balanceIndex(ueList, serverList);
 		PerformanceEvaluation.averageLatency(ueList, serverList);
 		PerformanceEvaluation.avergeServedUEs(ueList, serverList);
 		PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
+		PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
 	}
 	
 	public static List<UE> ReadUE(String file) throws IOException
@@ -135,7 +137,8 @@ public class Main {
 			// 4. UEs propose to the first preferred server.
 			for(int i = 0; i < ueList.size(); i++)
 			{
-				if(ueList.get(i).getAccept() == false)
+				if((ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() == -1)
+						||	(ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() > -1 && ueList.get(i).getProposeTo() != -1))
 				{
 					ueList.get(i).setProposeTo();
 					System.out.printf("UE %d proposes to server %d.\n", i, ueList.get(i).getProposeTo());
@@ -287,7 +290,8 @@ public class Main {
 			// Each UE propose to the first server in its preference list
 			for(int i = 0; i < ueList.size(); i++)
 			{
-				if(ueList.get(i).getAccept() == false)
+				if((ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() == -1)
+					||	(ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() > -1 && ueList.get(i).getProposeTo() != -1))
 				{
 					ueList.get(i).setProposeTo();
 					System.out.printf("UE %d propose to server %d.\n", i, ueList.get(i).getProposeTo());
@@ -354,6 +358,14 @@ public class Main {
 					{
 						System.out.println("Exceed the capacity.\n");
 						ueList.get(serverList.get(i).getPreference()[j]).setProposeTo(-1);
+						int c = ueList.get(serverList.get(i).getPreference()[j]).checkTheCount(-1);
+						if(ueList.get(serverList.get(i).getPreference()[j]).getPreferenceCount() == -1)
+							ueList.get(serverList.get(i).getPreference()[j]).setPreferenceCount(c);
+						else
+						{
+							int c1 = ueList.get(serverList.get(i).getPreference()[j]).getPreferenceCount();
+							ueList.get(serverList.get(i).getPreference()[j]).setPreferenceCount(c - c1 - 1);
+						}
 					}
 				}
 			}

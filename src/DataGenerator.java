@@ -12,8 +12,8 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 		// Basic environment settings.
-		int UE = 400;
-		int server = 21;
+		int UE = 40;
+		int server = 3;
 		double percentage = 0.6; // the percentage of UEs have latency constraint.
 		int[] maxLatencyRange = {1,100};
 		double[] area = {100, 100};
@@ -202,6 +202,8 @@ public class DataGenerator
 	}
 	public static List<int[]> generateLatencyList(int UE, int server, double[] area)
 	{
+		// This function is to generate the locations of servers and UEs randomly, 
+		// and the latency equals to the distance between server and UE.	
 		List<Point2D> UECoordinate = new ArrayList<>();
 		List<Point2D> serverCoordinate = new ArrayList<>();
 		List<int[]> distance = new ArrayList<>();
