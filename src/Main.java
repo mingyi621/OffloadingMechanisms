@@ -12,7 +12,7 @@ public class Main {
 	{
 		// Basic input settings.
 		int UE = 100;
-		int server = 10;
+		int server = 4;
 		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE1.csv";
 		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server1.csv";
 		String inputLatencyPath = "input/" + "latency/" + "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" + "latency1.csv";
@@ -67,6 +67,9 @@ public class Main {
 		
 		// Boston Mechanism
 //		BostonMechanism(ueList, serverList);
+		
+		// Without Outsourcing
+//		WithoutOutsourcing(ueList, serverList);
 		
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
@@ -326,6 +329,36 @@ public class Main {
 			}
 		}while(globalRejection);
 	}
+	public static void WithoutOutsourcing(List<UE> ueList, List<Server> serverList)
+	{
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			ueList.get(i).setProposeTo();
+			System.out.printf("UE %d propose to server %d.\n", i, ueList.get(i).getProposeTo());
+		}
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			for(int j = 0; j < serverList.get(i).getPreference().length; j++)
+			{
+				if(ueList.get(serverList.get(i).getPreference()[j]).getProposeTo() == i)
+				{
+					System.out.printf("Server %d got propose from UE %d.\n", i, serverList.get(i).getPreference()[j]);
+					if(serverList.get(i).checkWhetherExceedCapacity(ueList.get(serverList.get(i).getPreference()[j]).getDemand()) == false)
+					{
+						System.out.printf("UE %d got accepted.\n", serverList.get(i).getPreference()[j]);
+						ueList.get(serverList.get(i).getPreference()[j]).setAccept(true);
+						serverList.get(i).setUsed(ueList.get(serverList.get(i).getPreference()[j]).getDemand());
+						serverList.get(i).addServedUEList(ueList.get(serverList.get(i).getPreference()[j]));
+					}
+					else
+					{
+						System.out.println("Exceed the capacity.\n");
+						ueList.get(serverList.get(i).getPreference()[j]).setProposeTo(-1);
+					}
+				}
+			}
+		}
+	}	
 	public static void WriteToFile(List<UE> ueList, List<Server> serverList, String outputFile) throws IOException
 	{
 		FileWriter w = new FileWriter(outputFile);

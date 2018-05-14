@@ -1,6 +1,9 @@
 // This code is from http://www.java2s.com/Code/Java/Chart/JFreeChartXYLineAndShapeRendererDemo.htm
 // This code is to create a figure for line and shape.
 
+import java.awt.geom.Point2D;
+import java.util.List;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,10 +26,10 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
      *
      * @param title  the frame title.
      */
-    public XYLineAndShapeRendererDemo(final String title) {
+    public XYLineAndShapeRendererDemo(String title, List<Point2D> UECoordinate, List<Point2D> serverCoordinate) {
 
         super(title);
-        XYDataset dataset = createSampleDataset();
+        XYDataset dataset = createSampleDataset(UECoordinate, serverCoordinate);
         JFreeChart chart = ChartFactory.createXYLineChart(
             title,
             "X",
@@ -39,14 +42,14 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
         );
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesLinesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
         renderer.setSeriesShapesVisible(0, true);
-        renderer.setSeriesLinesVisible(1, true);
+        renderer.setSeriesLinesVisible(1, false);
         renderer.setSeriesShapesVisible(1, true); 
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(null);
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
+        chartPanel.setPreferredSize(new java.awt.Dimension(1000, 1000));
         setContentPane(chartPanel);
 
     }
@@ -56,16 +59,17 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
      * 
      * @return A dataset.
      */
-    private XYDataset createSampleDataset() {
-        XYSeries series1 = new XYSeries("Series 1");
-        series1.add(1.0, 3.3);
-        series1.add(2.0, 4.4);
-        series1.add(3.0, 1.7);
-        XYSeries series2 = new XYSeries("Series 2");
-        series2.add(1.0, 7.3);
-        series2.add(2.0, 6.8);
-        series2.add(3.0, 9.6);
-        series2.add(4.0, 5.6);
+    private XYDataset createSampleDataset(List<Point2D> UECoordinate, List<Point2D> serverCoordinate) {
+    	XYSeries series1 = new XYSeries("ServerCoordinate");
+        for(int i = 0; i < serverCoordinate.size(); i++)
+        {
+        	series1.add(serverCoordinate.get(i).getX(), serverCoordinate.get(i).getY());
+        }
+    	XYSeries series2 = new XYSeries("UE Coordinate");
+        for(int i = 0; i < UECoordinate.size(); i++)
+        {
+        	series2.add(UECoordinate.get(i).getX(), UECoordinate.get(i).getY());
+        }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series1);
         dataset.addSeries(series2);
@@ -88,15 +92,25 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
      *
      * @param args  ignored.
      */
-    public static void main(final String[] args) {
-
-        final XYLineAndShapeRendererDemo demo = new XYLineAndShapeRendererDemo(
-            "XYLineAndShapeRenderer Demo"
-        );
-        demo.pack();
-        RefineryUtilities.centerFrameOnScreen(demo);
-        demo.setVisible(true);
-
+//    public static void main(final String[] args) {
+//
+//        final XYLineAndShapeRendererDemo demo = new XYLineAndShapeRendererDemo(
+//            "XYLineAndShapeRenderer Demo"
+//        );
+//        demo.pack();
+//        RefineryUtilities.centerFrameOnScreen(demo);
+//        demo.setVisible(true);
+//
+//    }
+    
+    public static void showRenderer(List<Point2D> UECoordinate, List<Point2D> serverCoordinate)
+    {
+    	XYLineAndShapeRendererDemo demo = new XYLineAndShapeRendererDemo(
+                "XYLineAndShapeRenderer Demo", UECoordinate, serverCoordinate);
+            
+            demo.pack();
+            RefineryUtilities.centerFrameOnScreen(demo);
+            demo.setVisible(true);
     }
 
 }

@@ -96,4 +96,22 @@ public class Function
 		}
 		return Math.sqrt(numerator / (array.size()));	
 	}
+	// calculate minimum of an array
+	public static int minimum(int[] array)
+	{
+		int minimum;
+		if(array.length > 0)
+		{
+			minimum = array[0];
+			for(int i = 0; i < array.length; i++)
+			{
+				if(array[i] < minimum)
+					minimum = array[i];
+			}
+		}
+		else 
+			minimum = -1;
+		return minimum;
+		
+	}
 }

@@ -12,8 +12,8 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 		// Basic environment settings.
-		int UE = 40;
-		int server = 4;
+		int UE = 400;
+		int server = 21;
 		double percentage = 0.6; // the percentage of UEs have latency constraint.
 		int[] maxLatencyRange = {1,100};
 		double[] area = {100, 100};
@@ -47,7 +47,9 @@ public class DataGenerator
 		writeToServerFile(outputServerPath, serverList);	
 		
 		// Process latency files.
-		List<int[]> latencyList = generateLatencyList(UE, server, area);
+//		List<int[]> latencyList = generateLatencyList(UE, server, area);
+//		List<int[]> latencyList = generateLatencyListWithLocality(UE, server, area);
+		List<int[]> latencyList = generateLatencyListWithClusterAndLocality(UE, server, area);
 		writeToLatencyFile(outputLatencyPath, latencyList);
 		
 	}
@@ -61,6 +63,7 @@ public class DataGenerator
 		double[] vm3 = {4, 15, 80};
 		double[] vm4 = {8, 30, 160};
 		
+		System.out.println("Generating Requests:");
 		for(int i = 0; i < UE; i++)
 		{
 			d = random.nextGaussian() / 1;
@@ -85,7 +88,8 @@ public class DataGenerator
 			System.out.printf("%.0f, %.2f, %.0f\n", cpu, memory, storage);
 			double[] row = {cpu, memory, storage};
 			list.add(row);
-		}	
+		}
+		System.out.println();
 		return list;
 	}
 	public static List<int[]> generateMaxLatency(int UE, double percentage, int[] latencyRange, double[] area)
@@ -93,6 +97,7 @@ public class DataGenerator
 		List<int[]> list = new ArrayList<>();
 		Random random = new Random();
 		
+		System.out.println("Generating max latency:");
 		for(int i = 0; i < UE; i++)
 		{
 			int[] latency = {-1};
@@ -105,6 +110,7 @@ public class DataGenerator
 			System.out.printf("Latency = %d\n", latency[0]);
 			list.add(latency);
 		}
+		System.out.println();
 		return list;
 	}
 	public static void test()
@@ -137,7 +143,7 @@ public class DataGenerator
 		BufferedWriter bw = new BufferedWriter(w);
 		
 		String row;
-		
+		System.out.println("Writing UE files:");
 		for(int i = 0; i < requestList.size(); i++)
 		{ 
 			row = String.valueOf(requestList.get(i)[0]) + ","
@@ -148,6 +154,7 @@ public class DataGenerator
 			bw.write(row);
 			bw.newLine();
 		}
+		System.out.println();
 		
 		bw.flush();
 		bw.close();
@@ -161,22 +168,24 @@ public class DataGenerator
 		Random random = new Random();
 		List<double[]> list = new ArrayList<>();
 		
+		
 		for(int i = 0; i < server; i++)
 		{
 			double[] row = { Math.round((random.nextGaussian() * sd[0] + mean[0]) ),
 						     Math.round((random.nextGaussian() * sd[1] + mean[1]) ),
 						     Math.round((random.nextGaussian() * sd[2] + mean[2]) )};
 			list.add(row);
+			
 		}
+		System.out.println();
 		return list;
 	}
 	public static void writeToServerFile(String outputFile, List<double[]> serverList) throws IOException
 	{
 		FileWriter w = new FileWriter(outputFile);
 		BufferedWriter bw = new BufferedWriter(w);
-		
-		
-		
+	
+		System.out.println("Writing servers:");
 		for(int i = 0; i < serverList.size(); i++)
 		{ 
 			String row = String.valueOf(serverList.get(i)[0]) + ","
@@ -186,6 +195,7 @@ public class DataGenerator
 			bw.write(row);
 			bw.newLine();
 		}
+		System.out.println();
 		
 		bw.flush();
 		bw.close();
@@ -222,13 +232,147 @@ public class DataGenerator
 			}
 			distance.add(row);			
 		}
+		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
 		return distance;
 	}
+	public static List<int[]> generateLatencyListWithLocality(int UE, int server, double[] area)
+	{
+		int localityLatency = 1;
+//		double servedRadius = area[0] / (Math.sqrt(server) * 2);
+//		System.out.printf("Served Radius = %.2f\n", servedRadius);
+		
+		List<Point2D> UECoordinate = new ArrayList<>();
+		List<Point2D> serverCoordinate = new ArrayList<>();
+		List<int[]> distance = new ArrayList<>();
+		
+		Random random = new Random();
+		
+		for(int i = 0; i < UE; i++)
+		{	
+			Point2D coordinate = new Point2D.Double();
+			coordinate.setLocation(random.nextDouble() * area[0], random.nextDouble() * area[1]);
+			UECoordinate.add(coordinate);
+		}
+		
+		for(int j = 0; j < server; j++)
+		{
+			Point2D coordinate = new Point2D.Double();
+			coordinate.setLocation(random.nextDouble() * area[0], random.nextDouble() * area[1]);
+			serverCoordinate.add(coordinate);
+		}
+		for(int i = 0; i < UE; i++)
+		{
+			int[] row = new int[server];
+			int minimum = (int)UECoordinate.get(i).distance(serverCoordinate.get(0)); 
+			int minimumServer = 0;
+			Point2D minimumCoordinate = serverCoordinate.get(0);
+			for(int j = 0; j < server; j++)
+			{
+				int checkDistance = (int)UECoordinate.get(i).distance(serverCoordinate.get(j));
+				if(checkDistance < minimum)
+				{
+					minimum = row[j];
+					minimumServer = j;
+					minimumCoordinate = serverCoordinate.get(j);
+				}	
+			}
+			for(int j = 0; j < server; j++)
+			{
+				if(j != minimumServer)
+				{
+					row[j] = (int) (localityLatency + serverCoordinate.get(j).distance(minimumCoordinate));
+				}
+				else 
+				{
+					row[j] = localityLatency;
+					System.out.printf("Local served, distance = %d\n", (int) UECoordinate.get(i).distance(serverCoordinate.get(j)));
+				}
+			}
+			distance.add(row);			
+		}
+		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+		
+		return distance;
+	}
+	public static List<int[]> generateLatencyListWithClusterAndLocality(int UE, int server, double[] area)
+	{
+		int localityLatency = 1;
+		double servedRadius = area[0] / (Math.sqrt(Math.sqrt(server)) * 2);
+
+		System.out.printf("Served Radius = %.2f\n", servedRadius);
+		int sd = server / 4;
+	
+		List<Point2D> UECoordinate = new ArrayList<>();
+		List<Point2D> serverCoordinate = new ArrayList<>();
+		List<int[]> distance = new ArrayList<>();
+		
+		Random random = new Random();
+		
+		for(int j = 0; j < server; j++)
+		{
+			Point2D coordinate = new Point2D.Double();
+			coordinate.setLocation(random.nextDouble() * area[0], random.nextDouble() * area[1]);
+			serverCoordinate.add(coordinate);
+		}
+		
+		for(int i = 0; i < UE; i++)
+		{	
+			Point2D coordinate = new Point2D.Double();
+			int s;
+			do{
+				s = (int)(random.nextGaussian() * sd + (server - 1) / 2);
+			}while(s < 0 || s >= server);
+			
+			double X, Y;
+			double theta = random.nextDouble() * 360;
+			double radius = Math.abs(random.nextGaussian() * (servedRadius / 2));
+		
+			X = serverCoordinate.get(s).getX() + radius * Math.cos(Math.toRadians(theta));
+			Y = serverCoordinate.get(s).getY() + radius * Math.sin(Math.toRadians(theta));
+			
+			coordinate.setLocation(X, Y);
+			UECoordinate.add(coordinate);
+		}
+		for(int i = 0; i < UE; i++)
+		{
+			int[] row = new int[server];
+			int minimum = (int)UECoordinate.get(i).distance(serverCoordinate.get(0)); 
+			int minimumServer = 0;
+			Point2D minimumCoordinate = serverCoordinate.get(0);
+			for(int j = 0; j < server; j++)
+			{
+				int checkDistance = (int)UECoordinate.get(i).distance(serverCoordinate.get(j));
+				if(checkDistance < minimum)
+				{
+					minimum = row[j];
+					minimumServer = j;
+					minimumCoordinate = serverCoordinate.get(j);
+				}	
+			}
+			for(int j = 0; j < server; j++)
+			{
+				if(j == minimumServer) 
+				{
+					row[j] = localityLatency;
+					System.out.printf("Local served, distance = %d\n", (int) UECoordinate.get(i).distance(serverCoordinate.get(j)));
+				}
+				else
+				{
+					row[j] = (int) (localityLatency + serverCoordinate.get(j).distance(minimumCoordinate));
+				}
+				
+			}
+			distance.add(row);			
+		}
+		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+		return distance;
+	}	
 	public static void writeToLatencyFile(String outputFile, List<int[]> latencyList) throws IOException
 	{
 		FileWriter w = new FileWriter(outputFile);
 		BufferedWriter bw = new BufferedWriter(w);
 		
+		System.out.println("Writing latency files:");
 		for(int i = 0; i < latencyList.size(); i++)
 		{
 			String row = "";
@@ -238,10 +382,11 @@ public class DataGenerator
 				if(j != latencyList.get(i).length - 1)	
 					row = row + ",";
 			}
-//			System.out.println(row);
+			System.out.println(row);
 			bw.write(row);
 			bw.newLine();
 		}
+		System.out.println();
 		
 		bw.flush();
 		bw.close();
