@@ -10,16 +10,70 @@ public class Main {
 
 	public static void main(String[] args) throws IOException
 	{
+		bulkSetDataProcessor();
+//		oneSetDataProcessor(40, 4, 1, 0);
+	}
+	public static void bulkSetDataProcessor() throws IOException
+	{
+		int[] UERange = { 50, 500 };	// Both inclusion
+		int UEInterval = 50;
+		int[] serverRange = { 10, 10 }; // Both inclusion
+		int serverInterval = 10;
+		int numberOfSetForEachUE = 10;
+		
+		for(int algo = 0; algo <= 3; algo++)
+		{
+			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
+			{	
+				for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
+				{
+					List<double[]> performance = new ArrayList<>();
+					for(int ordinal = 0; ordinal < numberOfSetForEachUE; ordinal++)
+					{
+						double[] onePerformanceArray = oneSetDataProcessor(UE, server, ordinal, algo);
+						performance.add(onePerformanceArray);
+					}
+					double[] averagedPerformanceArray = PerformanceEvaluation.performanceAverager(performance);
+					PerformanceEvaluation.performanceOutputFile(UE, server, algo, averagedPerformanceArray);
+				}
+			}	
+		}
+	}
+	public static double[] oneSetDataProcessor(int UE, int server, int ordinal, int algo) throws IOException
+	{
 		// Basic input settings.
-		int UE = 40;
-		int server = 4;
-		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE1.csv";
-		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server1.csv";
-		String inputLatencyPath = "input/" + "latency/" + "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" + "latency1.csv";
+//		int UE = 40;
+//		int server = 4;
+//		int ordinal = 1;
+//		int algo = 0; 
+		
+		String algoString;
+		switch(algo)
+		{
+			case 0:
+				algoString = "DA";
+				break;
+			case 1:
+				algoString = "Random";
+				break;
+			case 2:
+				algoString = "Boston";
+				break;
+			case 3:
+				algoString = "WOIntra";
+				break;
+			default:
+				algoString = "--";
+				break;
+		}
+		
+		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE" + ordinal + ".csv";
+		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server" + ordinal + ".csv";
+		String inputLatencyPath = "input/" + "latency/" + "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" + "latency" + ordinal +".csv";
 		
 		// Output settings.
-		String outputDirectory = "output/" +  "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" ;
-		String outputFile = "output1.csv";		
+		String outputDirectory = "output/" + algoString + "/" +  "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" ;
+		String outputFile = "output" + ordinal +".csv";		
 		File outputDir = new File(outputDirectory);
 	    if (!outputDir.exists())	outputDir.mkdir();	    
 	    String outputPath = outputDirectory + outputFile;
@@ -59,31 +113,42 @@ public class Main {
 			serverList.get(i).showPreference();
 		}
 		
-		// 4&5. Deferred Acceptance Algorithm
-		deferredAcceptanceAlgorithm(ueList, serverList);
+		switch(algo)
+		{
+			case 0:
+				deferredAcceptanceAlgorithm(ueList, serverList);
+				break;
 		
-		// Random Algorithm
-//		RandomAlgorithm(ueList, serverList);
+			case 1:
+				RandomAlgorithm(ueList, serverList);
+				break;
+				
+			case 2:
+				BostonMechanism(ueList, serverList);
+				break;
 		
-		// Boston Mechanism
-//		BostonMechanism(ueList, serverList);
-		
-		// Without Outsourcing
-//		WithoutOutsourcing(ueList, serverList);
-		
+			case 3:	
+				WithoutOutsourcing(ueList, serverList);
+				break;
+				
+			default:
+				break;
+		}
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
 		
+		double[] performance = new double[7];
 		// Performance evaluation.
-		PerformanceEvaluation.averageOfPreference(ueList, serverList);
-		PerformanceEvaluation.standardDeviationOfPreference(ueList, serverList);
-		PerformanceEvaluation.balanceIndex(ueList, serverList);
-		PerformanceEvaluation.averageLatency(ueList, serverList);
-		PerformanceEvaluation.avergeServedUEs(ueList, serverList);
-		PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
-		PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
+		performance[0] = PerformanceEvaluation.averageOfPreference(ueList, serverList);
+		performance[1] = PerformanceEvaluation.standardDeviationOfPreference(ueList, serverList);
+		performance[2] = PerformanceEvaluation.balanceIndexOfServers(ueList, serverList);
+		performance[3] = PerformanceEvaluation.averageLatency(ueList, serverList);
+		performance[4] = PerformanceEvaluation.avergeServedUEs(ueList, serverList);
+		performance[5] = PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
+		performance[6] = PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
+		
+		return performance;
 	}
-	
 	public static List<UE> ReadUE(String file) throws IOException
 	{
 		FileReader fr = new FileReader(file);

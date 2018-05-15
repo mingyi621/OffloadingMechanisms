@@ -1,3 +1,7 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +31,7 @@ public class PerformanceEvaluation
 		System.out.printf("SD of preference = %.2f\n", result);
 		return result;
 	}
-	public static double balanceIndex(List<UE> ueList, List<Server> serverList)
+	public static double balanceIndexOfServers(List<UE> ueList, List<Server> serverList)
 	{
 		double result = 0;
 		double numerator = 0;
@@ -130,7 +134,71 @@ public class PerformanceEvaluation
 		double result = numerator/denominator;
 		System.out.printf("Number of outsourcing requests = %.0f\n"
 				+ "Number of served request = %.0f\n"
-				+ "Percentage of outsourcing = %.2f", denominator, numerator, result);
+				+ "Percentage of outsourcing = %.2f\n", denominator, numerator, result);
 		return result;
+	}
+	
+	public static double[] performanceAverager(List<double[]> performance)
+	{
+		double[] result = new double[performance.get(0).length];
+		for(int i = 0; i < result.length; i++)
+		{
+			result[i] = 0;
+		}
+		
+		for(int i = 0; i < result.length; i++)
+		{
+			for(int j = 0; j < performance.size(); j++)
+			{
+				result[i] = result[i] + performance.get(j)[i];
+			}
+			result[i] = result[i] / performance.size();
+		}
+		return result;
+	}
+	public static void performanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
+	{
+		// Output settings.
+		String algoString;
+		switch(algo)
+		{
+			case 0:
+				algoString = "DA";
+				break;
+			case 1:
+				algoString = "Random";
+				break;
+			case 2:
+				algoString = "Boston";
+				break;
+			case 3:
+				algoString = "WOIntra";
+				break;
+			default:
+				algoString = "--";
+				break;
+		}
+		
+		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + ".csv";		
+		
+		File outputDir = new File(outputDirectory);
+		if (!outputDir.exists())	outputDir.mkdir();	    
+		String outputPath = outputDirectory + outputFile;
+		
+		FileWriter w = new FileWriter(outputPath);
+		BufferedWriter bw = new BufferedWriter(w);
+		
+		String line = UE + "," + server + ",";
+		
+		for(int i = 0; i < averagedPerformanceArray.length; i++)
+		{
+			line = line + averagedPerformanceArray[i];
+			if(i < averagedPerformanceArray.length - 1)
+				line = line + ",";
+		}
+		System.out.println(line);
+		bw.write(line);
+		bw.close();
 	}
 }

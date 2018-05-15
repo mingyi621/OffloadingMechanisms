@@ -11,47 +11,71 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
+		bulkSetDataGenerator();
+//		oneSetDataGenerator(40, 4, 1);
+	}
+	public static void bulkSetDataGenerator() throws IOException
+	{
+		int[] UERange = { 50, 500 };	// Both inclusion
+		int UEInterval = 50;
+		int[] serverRange = { 10, 10 }; // Both inclusion
+		int serverInterval = 10;
+		int numberOfSetForEachUE = 10;
+
+		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
+		{
+			for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
+			{
+				for(int ordinal = 0; ordinal < numberOfSetForEachUE; ordinal++)
+				{
+					oneSetDataGenerator(UE, server, ordinal);
+				}
+			}
+		}	
+	}
+	public static void oneSetDataGenerator(int UE, int server, int ordinal) throws IOException
+	{
 		// Basic environment settings.
-		int UE = 40;
-		int server = 3;
+//		int UE = 40;
+//		int server = 3;
+//		int ordinal = 1;
 		double percentage = 0.6; // the percentage of UEs have latency constraint.
 		int[] maxLatencyRange = {1,100};
 		double[] area = {100, 100};
 
 		// File Path settings.
 		String UEdirectory = "input/" + "UE/" + Integer.toString(UE);
-		String UEfileName = "UE1.csv";
+		String UEfileName = "UE" + ordinal +".csv";
 		String serverDirectory = "input/" + "server/" + Integer.toString(server);
-		String serverFileName = "server1.csv";
+		String serverFileName = "server" + ordinal +".csv";
 		String latencyDirectory = "input/" + "latency/" + "UE" + Integer.toString(UE) + "-" + "server" + Integer.toString(server);
-		String latencyFileName = "latency1.csv";
-	    
+		String latencyFileName = "latency" + ordinal + ".csv";
+			    
 		File UEdir = new File(UEdirectory);
-	    if (!UEdir.exists())	UEdir.mkdir();	    
-	    File serverDir = new File(serverDirectory);
-	    if (!serverDir.exists())	serverDir.mkdirs();
-	    File latencyDir = new File(latencyDirectory);
-	    if (!latencyDir.exists())	latencyDir.mkdirs();
-	        
+		if (!UEdir.exists())	UEdir.mkdir();	    
+		File serverDir = new File(serverDirectory);
+		if (!serverDir.exists())	serverDir.mkdirs();
+		File latencyDir = new File(latencyDirectory);
+		if (!latencyDir.exists())	latencyDir.mkdirs();
+			        
 		String outputUEPath = UEdirectory + "/" + UEfileName;
 		String outputServerPath = serverDirectory + "/" + serverFileName;
 		String outputLatencyPath = latencyDirectory + "/" + latencyFileName;
-		
-		// Process UE files.
+				
+				// Process UE files.
 		List<double[]> requestList = generateRequest(UE);
 		List<int[]> maxLatencyList = generateMaxLatency(UE, percentage, maxLatencyRange, area);	
 		writeToUEFile(outputUEPath, requestList, maxLatencyList);	
-		
+				
 		// Process server files.
 		List<double[]> serverList = generateServer(server);
 		writeToServerFile(outputServerPath, serverList);	
-		
+				
 		// Process latency files.
 //		List<int[]> latencyList = generateLatencyList(UE, server, area);
 //		List<int[]> latencyList = generateLatencyListWithLocality(UE, server, area);
 		List<int[]> latencyList = generateLatencyListWithClusterAndLocality(UE, server, area);
 		writeToLatencyFile(outputLatencyPath, latencyList);
-		
 	}
 	public static List<double[]> generateRequest(int UE)
 	{
@@ -366,7 +390,7 @@ public class DataGenerator
 			}
 			distance.add(row);			
 		}
-		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+//		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
 		return distance;
 	}	
 	public static void writeToLatencyFile(String outputFile, List<int[]> latencyList) throws IOException

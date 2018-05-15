@@ -2,6 +2,9 @@
 // This code is to create a figure for line and shape.
 
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import org.jfree.chart.ChartFactory;
