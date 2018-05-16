@@ -12,11 +12,11 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 		bulkSetDataGenerator();
-//		oneSetDataGenerator(40, 4, 1);
+//		oneSetDataGenerator(2000, 1, 1); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
-		int[] UERange = { 50, 500 };	// Both inclusion
+		int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
@@ -90,13 +90,13 @@ public class DataGenerator
 		System.out.println("Generating Requests:");
 		for(int i = 0; i < UE; i++)
 		{
-			d = random.nextGaussian() / 1;
+			d = random.nextGaussian() / 1;  
 			int m1 = Math.abs((int) Math.round(d));
-			d = random.nextGaussian() / 1;
+			d = random.nextGaussian() / 1;  
 			int m2 = Math.abs((int) Math.round(d));
-			d = random.nextGaussian() / 2;
+			d = random.nextGaussian() / 2;  
 			int m3 = Math.abs((int) Math.round(d));	
-			d = random.nextGaussian() / 3;
+			d = random.nextGaussian() / 3;  
 			int m4 = Math.abs((int) Math.round(d));
 		
 			double cpu = m1 * vm1[0] + m2 * vm2[0] + m3 * vm3[0] + m4 * vm4[0];
@@ -198,8 +198,7 @@ public class DataGenerator
 			double[] row = { Math.round((random.nextGaussian() * sd[0] + mean[0]) ),
 						     Math.round((random.nextGaussian() * sd[1] + mean[1]) ),
 						     Math.round((random.nextGaussian() * sd[2] + mean[2]) )};
-			list.add(row);
-			
+			list.add(row);		
 		}
 		System.out.println();
 		return list;

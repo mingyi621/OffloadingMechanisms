@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,21 +22,22 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		ShowFigure demo = new ShowFigure("Figure");
+		int whichColumnIndex = 3;  // input 2~10
+		ShowFigure demo = new ShowFigure(whichColumnIndex);
             
 		demo.pack();
 		RefineryUtilities.centerFrameOnScreen(demo);
 		demo.setVisible(true);
 	}
 	
-	public ShowFigure(String title) throws IOException
+	public ShowFigure(int c) throws IOException
 	{
-        super(title);
-        XYDataset dataset = readFile();
+        super(columnIndextoString(c)[0]);
+        XYDataset dataset = readFile(c);
         JFreeChart chart = ChartFactory.createXYLineChart(
-            title,
-            "UE",  		// x
-            "Y", 	// y
+        	columnIndextoString(c)[0],	// Title
+        	columnIndextoString(c)[1],  // X
+        	columnIndextoString(c)[2], 	// Y
             dataset,
             PlotOrientation.VERTICAL,
             true,
@@ -44,6 +46,7 @@ public class ShowFigure extends ApplicationFrame
         );
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
         renderer.setSeriesLinesVisible(0, true);
         renderer.setSeriesShapesVisible(0, true);
         renderer.setSeriesLinesVisible(1, true);
@@ -60,18 +63,18 @@ public class ShowFigure extends ApplicationFrame
 
     }
 	
-	public static XYDataset readFile() throws IOException
+	public static XYDataset readFile(int c) throws IOException
     {
     	XYSeries series0 = new XYSeries("DA");
     	XYSeries series1 = new XYSeries("Random");
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
     	
-    	int[] UERange = { 50, 500 };	// Both inclusion
+    	int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int metricIndex = 2; // 2: average 
+		int metricIndex = c; 			
 		
     	for(int algo = 0; algo <= 3; algo++)
     	{
@@ -132,5 +135,59 @@ public class ShowFigure extends ApplicationFrame
         dataset.addSeries(series3);
         return dataset;
     }
+	public static String[] columnIndextoString(int c)
+	{
+		String[] result = {"Title", "X", "Y"};
+		switch(c)
+		{
+			case 2:
+				result[0] = "Average of Preferences of all UEs";
+				result[1] = "Numbers of UEs";
+				result[2] = "Preference Count";
+				break;
+			case 3:
+				result[0] = "Standard Deviation of Preferences of all UEs";
+				result[1] = "Numbers of UEs";
+				result[2] = "Standard Deviation";
+				break;
+			case 4:
+				result[0] = "Balance Index of Servers";
+				result[1] = "Numbers of UEs";
+				result[2] = "Balance Index";
+				break;
+			case 5:
+				result[0] = "Average Latency of Accepted UEs";
+				result[1] = "Numbers of UEs";
+				result[2] = "Average Latency";
+				break;
+			case 6:
+				result[0] = "Average Number of Served UEs of Each Server";
+				result[1] = "Numbers of UEs";
+				result[2] = "Number of Served UEs";
+				break;
+			case 7:
+				result[0] = "Standard Deviation of served Latency";
+				result[1] = "Numbers of UEs";
+				result[2] = "Standard Deviation";
+				break;
+			case 8:
+				result[0] = "Percentage of Outsourcing";
+				result[1] = "Numbers of UEs";
+				result[2] = "Percentage";
+				break;
+			case 9:
+				result[0] = "Average of Preferences of Accepted UEs";
+				result[1] = "Numbers of UEs";
+				result[2] = "Preference Count";
+				break;
+			case 10:
+				result[0] = "Standard Deviation of Preferences of Accepted UEs";
+				result[1] = "Numbers of UEs";
+				result[2] = "Standard Deviation";
+			default:
+				break;
+		}
+		return result;
+	}
 	
 }

@@ -11,11 +11,11 @@ public class Main {
 	public static void main(String[] args) throws IOException
 	{
 		bulkSetDataProcessor();
-//		oneSetDataProcessor(40, 4, 1, 0);
+//		oneSetDataProcessor(8, 10, 5, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 50, 500 };	// Both inclusion
+		int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
@@ -137,7 +137,7 @@ public class Main {
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
 		
-		double[] performance = new double[7];
+		double[] performance = new double[9];
 		// Performance evaluation.
 		performance[0] = PerformanceEvaluation.averageOfPreference(ueList, serverList);
 		performance[1] = PerformanceEvaluation.standardDeviationOfPreference(ueList, serverList);
@@ -146,6 +146,8 @@ public class Main {
 		performance[4] = PerformanceEvaluation.avergeServedUEs(ueList, serverList);
 		performance[5] = PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
 		performance[6] = PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
+		performance[7] = PerformanceEvaluation.averageOfPreferenceOfAcceptUEs(ueList, serverList);
+		performance[8] = PerformanceEvaluation.standardDeviationOfPreferenceOfAcceptedUEs(ueList, serverList);
 		
 		return performance;
 	}

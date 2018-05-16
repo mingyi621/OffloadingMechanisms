@@ -132,9 +132,41 @@ public class PerformanceEvaluation
 				numerator++;
 		}
 		double result = numerator/denominator;
-		System.out.printf("Number of outsourcing requests = %.0f\n"
-				+ "Number of served request = %.0f\n"
+		System.out.printf("Number of served requests = %.0f\n"
+				+ "Number of outsourcing requests = %.0f\n"
 				+ "Percentage of outsourcing = %.2f\n", denominator, numerator, result);
+		return result;
+	}
+	public static double averageOfPreferenceOfAcceptUEs(List<UE> ueList, List<Server> serverList)
+	{
+		double result = 0;
+		int count = 0;
+		int numberOfAcceptedUEs = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				count = count + (ueList.get(i).getPreferenceCount() + 1);
+				numberOfAcceptedUEs++;
+			}
+		}
+		System.out.println("Sum of preference of accepted UEs= " + count);
+		result = (double)count/numberOfAcceptedUEs;
+		System.out.println("Average of preference of accepted UEs = " + result);
+		return result;
+	}
+	public static double standardDeviationOfPreferenceOfAcceptedUEs(List<UE> ueList, List<Server> serverList)
+	{
+		List<Double> array = new ArrayList<>();
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				array.add((double)ueList.get(i).getPreferenceCount());	
+			}
+		}
+		double result = Function.calculateSD(array);
+		System.out.printf("SD of preference of accepted UEs = %.2f\n", result);
 		return result;
 	}
 	
