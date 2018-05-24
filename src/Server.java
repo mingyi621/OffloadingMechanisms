@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.*;
 
-public class Server 
+public class Server implements Serializable
 {
 	double[] capacity;
 	int[] preference;

@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class UE 
+public class UE implements Serializable
 {
 	double[] demand;
 	double maxLatency;

@@ -114,4 +114,27 @@ public class Function
 		return minimum;
 		
 	}
+	public static String algoNumberToAlgoStream(int algo)
+	{
+		String algoString;
+		switch(algo)
+		{
+			case 0:
+				algoString = "DA";
+				break;
+			case 1:
+				algoString = "Random";
+				break;
+			case 2:
+				algoString = "Boston";
+				break;
+			case 3:
+				algoString = "WOIntra";
+				break;
+			default:
+				algoString = "--";
+				break;
+		}
+		return algoString;
+	}
 }

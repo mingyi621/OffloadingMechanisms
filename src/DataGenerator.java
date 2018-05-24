@@ -16,7 +16,7 @@ public class DataGenerator
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
-		int[] UERange = { 100, 100 };	// Both inclusion
+		int[] UERange = { 50, 100 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;

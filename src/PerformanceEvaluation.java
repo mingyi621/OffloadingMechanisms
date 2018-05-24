@@ -1,13 +1,86 @@
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class PerformanceEvaluation 
 {
+	public static void main(String[] args) throws ClassNotFoundException, IOException
+	{
+		bulkSetDataProcessor();
+//		oneSetDataProcessor(50, 10, 0, 0); // UE, server, ordinal, algo
+	}
+	public static void bulkSetDataProcessor() throws ClassNotFoundException, IOException
+	{
+		int[] UERange = { 50, 100 };	// Both inclusion
+		int UEInterval = 50;
+		int[] serverRange = { 10, 10 }; // Both inclusion
+		int serverInterval = 10;
+		int numberOfSetForEachUE = 50;
+		
+		for(int algo = 0; algo <= 3; algo++)
+		{
+			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
+			{	
+				for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
+				{
+					List<double[]> performance = new ArrayList<>();
+					List<double[]> barChartPerformance = new ArrayList<>();
+					List<double[]> latencyBarChartPerformance = new ArrayList<>();
+					for(int ordinal = 0; ordinal < numberOfSetForEachUE; ordinal++)
+					{
+						List<double[]> p = oneSetDataProcessor(UE, server, ordinal, algo);
+						double[] onePerformanceArray = p.get(0);
+						double[] oneBarChartArray = p.get(1);
+						double[] oneLatencyBarChartArray = p.get(2);
+						performance.add(onePerformanceArray);
+						barChartPerformance.add(oneBarChartArray);
+						latencyBarChartPerformance.add(oneLatencyBarChartArray);
+					}
+					double[] averagedPerformanceArray = PerformanceEvaluation.performanceAverager(performance);
+					double[] averagedBarChartArray = PerformanceEvaluation.performanceAverager(barChartPerformance);
+					double[] averagedLatencyBarChartArray = PerformanceEvaluation.performanceAverager(latencyBarChartPerformance);
+					performanceOutputFile(UE, server, algo, averagedPerformanceArray);
+					barChartPerformanceOutputFile(UE, server, algo, averagedBarChartArray);
+					latencyBarChartPerformanceOutputFile(UE, server, algo, averagedLatencyBarChartArray);
+				}
+			}	
+		}
+	}
+	
+	public static List<double[]> oneSetDataProcessor(int ue, int server, int ordinal, int algo) throws ClassNotFoundException, IOException
+	{
+		List<double[]> multiPerformance = new ArrayList<>(); // For performance array and bar chart array
+		
+		List<UE> ueList = ueListReader(ue, server, ordinal, algo);
+		List<Server> serverList = serverListReader(ue, server, ordinal, algo);
+		
+		double[] performance = new double[9];
+		performance[0] = averageOfPreference(ueList, serverList);
+		performance[1] = standardDeviationOfPreference(ueList, serverList);
+		performance[2] = balanceIndexOfServers(ueList, serverList);
+		performance[3] = averageLatency(ueList, serverList);
+		performance[4] = avergeServedUEs(ueList, serverList);
+		performance[5] = standardDeviationOfServedLatency(ueList, serverList);
+		performance[6] = percentageOfOutsourcing(ueList, serverList);
+		performance[7] = averageOfPreferenceOfAcceptUEs(ueList, serverList);
+		performance[8] = standardDeviationOfPreferenceOfAcceptedUEs(ueList, serverList);
+		multiPerformance.add(performance);
+		
+		double[] barChartPerformance = preferenceCountDistribution(ueList, serverList);
+		multiPerformance.add(barChartPerformance);
+		
+		double[] latencyBarChartPerformance = latencyCountDistribution(ueList, serverList);
+		multiPerformance.add(latencyBarChartPerformance);
+		
+		return multiPerformance;	
+	}
+	
 	public static double averageOfPreference(List<UE> ueList, List<Server> serverList)
 	{
 		double result = 0;
@@ -184,42 +257,6 @@ public class PerformanceEvaluation
 		}
 		return count;
 	}
-//	public static double[][] latencyCountDistribution(List<UE> ueList, List<Server> serverList)
-//	{
-//		LinkedList<double[]> count = new LinkedList<>();
-//		for(int i = 0; i < ueList.size(); i++)
-//		{
-//			if(ueList.get(i).getAccept())
-//			{
-//				int l = (int) ueList.get(i).getLatency()[ueList.get(i).getPreferenceCount()];
-//				if(count.get(l) == null)
-//				{
-//					double[] d = new double[2];
-//					d[0] = l;
-//					d[1] = 1;
-//					count.add(l, d);
-//				}
-//				else
-//				{
-//					count.get(l)[1] += 1;
-//				}
-//			}
-//		}
-//		double[] latency = new double[count.size()];
-//		double[] latencyCount = new double[count.size()];
-//		for(int i = 0; count.size() > 0; i++)
-//		{
-//			double[] a = count.getFirst();
-//			latency[i] = a[0];
-//			latencyCount[i] = a[1];
-//			count.removeFirst();
-//		}
-//		double[][] result = new double[1][2];
-//		result[0] = latency;
-//		result[1] = latencyCount;
-//		return result;
-//	}
-	
 	public static double[] latencyCountDistribution(List<UE> ueList, List<Server> serverList)
 	{
 		double[] count = new double[20];
@@ -388,5 +425,32 @@ public class PerformanceEvaluation
 		System.out.println(line);
 		bw.write(line);
 		bw.close();
+	}
+
+	public static List<UE> ueListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
+	{
+		String algoString = Function.algoNumberToAlgoStream(algo);
+		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "UE" + ordinal + ".ue";
+
+		FileInputStream fisUE = new FileInputStream(inputUEFilePath);
+		ObjectInputStream oisUE = new ObjectInputStream(fisUE);
+		
+		List<UE> ueList = (List<UE>) oisUE.readObject();
+		oisUE.close();
+		
+		return ueList;
+	}
+	public static List<Server> serverListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
+	{
+		String algoString = Function.algoNumberToAlgoStream(algo);
+		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "server" + ordinal + ".server";
+
+		FileInputStream fisServer = new FileInputStream(inputUEFilePath);
+		ObjectInputStream oisServer = new ObjectInputStream(fisServer);
+		
+		List<Server> serverList = (List<Server>) oisServer.readObject();
+		oisServer.close();
+		
+		return serverList;
 	}
 }

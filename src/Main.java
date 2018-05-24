@@ -1,9 +1,11 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class Main {
@@ -15,7 +17,7 @@ public class Main {
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 500, 500 };	// Both inclusion
+		int[] UERange = { 50, 100 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
@@ -27,30 +29,15 @@ public class Main {
 			{	
 				for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
 				{
-					List<double[]> performance = new ArrayList<>();
-					List<double[]> barChartPerformance = new ArrayList<>();
-					List<double[]> latencyBarChartPerformance = new ArrayList<>();
 					for(int ordinal = 0; ordinal < numberOfSetForEachUE; ordinal++)
 					{
-						List<double[]> p = oneSetDataProcessor(UE, server, ordinal, algo);
-						double[] onePerformanceArray = p.get(0);
-						double[] oneBarChartArray = p.get(1);
-						double[] oneLatencyBarChartArray = p.get(2);
-						performance.add(onePerformanceArray);
-						barChartPerformance.add(oneBarChartArray);
-						latencyBarChartPerformance.add(oneLatencyBarChartArray);
+						oneSetDataProcessor(UE, server, ordinal, algo);
 					}
-					double[] averagedPerformanceArray = PerformanceEvaluation.performanceAverager(performance);
-					double[] averagedBarChartArray = PerformanceEvaluation.performanceAverager(barChartPerformance);
-					double[] averagedLatencyBarChartArray = PerformanceEvaluation.performanceAverager(latencyBarChartPerformance);
-					PerformanceEvaluation.performanceOutputFile(UE, server, algo, averagedPerformanceArray);
-					PerformanceEvaluation.barChartPerformanceOutputFile(UE, server, algo, averagedBarChartArray);
-					PerformanceEvaluation.latencyBarChartPerformanceOutputFile(UE, server, algo, averagedLatencyBarChartArray);
 				}
 			}	
 		}
 	}
-	public static List<double[]> oneSetDataProcessor(int UE, int server, int ordinal, int algo) throws IOException
+	public static void oneSetDataProcessor(int UE, int server, int ordinal, int algo) throws IOException
 	{
 		// Basic input settings.
 //		int UE = 40;
@@ -58,32 +45,14 @@ public class Main {
 //		int ordinal = 1;
 //		int algo = 0; 
 		
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
-		String inputUEPath = "input/" + "UE/" +String.valueOf(UE) + "/" + "UE" + ordinal + ".csv";
-		String inputServerPath = "input/" + "server/" + String.valueOf(server) + "/" + "server" + ordinal + ".csv";
-		String inputLatencyPath = "input/" + "latency/" + "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" + "latency" + ordinal +".csv";
+		String inputUEPath = "input/" + "UE/" + UE + "/" + "UE" + ordinal + ".csv";
+		String inputServerPath = "input/" + "server/" + server + "/" + "server" + ordinal + ".csv";
+		String inputLatencyPath = "input/" + "latency/" + "UE" + UE + "-" + "server" + server + "/" + "latency" + ordinal +".csv";
 		
 		// Output settings.
-		String outputDirectory = "output/" + algoString + "/" +  "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "/" ;
+		String outputDirectory = "output/" + algoString + "/" +  "UE" + UE + "-" + "server" + server + "/" ;
 		String outputFile = "output" + ordinal +".csv";		
 		File outputDir = new File(outputDirectory);
 	    if (!outputDir.exists())	outputDir.mkdir();	    
@@ -147,29 +116,7 @@ public class Main {
 		}
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
-		
-		List<double[]> multiPerformance = new ArrayList<>(); // For performance array and bar chart array
-		
-		double[] performance = new double[9];
-		// Performance evaluation.
-		performance[0] = PerformanceEvaluation.averageOfPreference(ueList, serverList);
-		performance[1] = PerformanceEvaluation.standardDeviationOfPreference(ueList, serverList);
-		performance[2] = PerformanceEvaluation.balanceIndexOfServers(ueList, serverList);
-		performance[3] = PerformanceEvaluation.averageLatency(ueList, serverList);
-		performance[4] = PerformanceEvaluation.avergeServedUEs(ueList, serverList);
-		performance[5] = PerformanceEvaluation.standardDeviationOfServedLatency(ueList, serverList);
-		performance[6] = PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
-		performance[7] = PerformanceEvaluation.averageOfPreferenceOfAcceptUEs(ueList, serverList);
-		performance[8] = PerformanceEvaluation.standardDeviationOfPreferenceOfAcceptedUEs(ueList, serverList);
-		multiPerformance.add(performance);
-		
-		double[] barChartPerformance = PerformanceEvaluation.preferenceCountDistribution(ueList, serverList);
-		multiPerformance.add(barChartPerformance);
-		
-		double[] latencyBarChartPerformance = PerformanceEvaluation.latencyCountDistribution(ueList, serverList);
-		multiPerformance.add(latencyBarChartPerformance);
-		
-		return multiPerformance;
+		outputObjectToFile(ueList, serverList, outputDirectory, ordinal);
 	}
 	public static List<UE> ReadUE(String file) throws IOException
 	{
@@ -483,6 +430,23 @@ public class Main {
 		bw.close();
 		
 	}
+	
+	public static void outputObjectToFile(List<UE> ueList, List<Server> serverList, String outputDirectory, int ordinal) throws IOException
+	{
+		String outputPathUE = outputDirectory + "UE" + ordinal + ".ue";
+		String outputPathServer = outputDirectory + "server" + ordinal + ".server";
+		
+		FileOutputStream fosUE = new FileOutputStream(outputPathUE);
+		ObjectOutputStream oosUE = new ObjectOutputStream(fosUE);
+		oosUE.writeObject(ueList);
+		oosUE.close();
+		
+		FileOutputStream fosServer = new FileOutputStream(outputPathServer);
+		ObjectOutputStream oosServer = new ObjectOutputStream(fosServer);
+		oosServer.writeObject(serverList);
+		oosServer.close();		
+	}
+	
 	public static void oldImplement() throws IOException
 	{
 		System.out.println("Old implement");
