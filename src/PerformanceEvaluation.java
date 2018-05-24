@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PerformanceEvaluation 
@@ -169,6 +170,71 @@ public class PerformanceEvaluation
 		System.out.printf("SD of preference of accepted UEs = %.2f\n", result);
 		return result;
 	}
+	public static double[] preferenceCountDistribution(List<UE> ueList, List<Server> serverList)
+	{
+		double[] count = new double[serverList.size() + 1];
+		for(int i = 0; i < count.length; i++)	
+			count[i] = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+				count[ueList.get(i).getPreferenceCount()] += 1;
+//			else
+//				count[count.length-1] += 1;
+		}
+		return count;
+	}
+//	public static double[][] latencyCountDistribution(List<UE> ueList, List<Server> serverList)
+//	{
+//		LinkedList<double[]> count = new LinkedList<>();
+//		for(int i = 0; i < ueList.size(); i++)
+//		{
+//			if(ueList.get(i).getAccept())
+//			{
+//				int l = (int) ueList.get(i).getLatency()[ueList.get(i).getPreferenceCount()];
+//				if(count.get(l) == null)
+//				{
+//					double[] d = new double[2];
+//					d[0] = l;
+//					d[1] = 1;
+//					count.add(l, d);
+//				}
+//				else
+//				{
+//					count.get(l)[1] += 1;
+//				}
+//			}
+//		}
+//		double[] latency = new double[count.size()];
+//		double[] latencyCount = new double[count.size()];
+//		for(int i = 0; count.size() > 0; i++)
+//		{
+//			double[] a = count.getFirst();
+//			latency[i] = a[0];
+//			latencyCount[i] = a[1];
+//			count.removeFirst();
+//		}
+//		double[][] result = new double[1][2];
+//		result[0] = latency;
+//		result[1] = latencyCount;
+//		return result;
+//	}
+	
+	public static double[] latencyCountDistribution(List<UE> ueList, List<Server> serverList)
+	{
+		double[] count = new double[20];
+		for(int i = 0; i < count.length; i++) count[i] = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				double latency = ueList.get(i).getLatency()[ueList.get(i).getPreferenceCount()];
+				count[(int)(latency/10)] += 1;
+			}
+		}
+		return count;
+	}
+	
 	
 	public static double[] performanceAverager(List<double[]> performance)
 	{
@@ -213,6 +279,96 @@ public class PerformanceEvaluation
 		
 		String outputDirectory = "performance/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + ".csv";		
+		
+		File outputDir = new File(outputDirectory);
+		if (!outputDir.exists())	outputDir.mkdir();	    
+		String outputPath = outputDirectory + outputFile;
+		
+		FileWriter w = new FileWriter(outputPath);
+		BufferedWriter bw = new BufferedWriter(w);
+		
+		String line = UE + "," + server + ",";
+		
+		for(int i = 0; i < averagedPerformanceArray.length; i++)
+		{
+			line = line + averagedPerformanceArray[i];
+			if(i < averagedPerformanceArray.length - 1)
+				line = line + ",";
+		}
+		System.out.println(line);
+		bw.write(line);
+		bw.close();
+	}	
+	public static void barChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
+	{
+		// Output settings.
+		String algoString;
+		switch(algo)
+		{
+			case 0:
+				algoString = "DA";
+				break;
+			case 1:
+				algoString = "Random";
+				break;
+			case 2:
+				algoString = "Boston";
+				break;
+			case 3:
+				algoString = "WOIntra";
+				break;
+			default:
+				algoString = "--";
+				break;
+		}
+		
+		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "BarChart"+ ".csv";		
+		
+		File outputDir = new File(outputDirectory);
+		if (!outputDir.exists())	outputDir.mkdir();	    
+		String outputPath = outputDirectory + outputFile;
+		
+		FileWriter w = new FileWriter(outputPath);
+		BufferedWriter bw = new BufferedWriter(w);
+		
+		String line = UE + "," + server + ",";
+		
+		for(int i = 0; i < averagedPerformanceArray.length; i++)
+		{
+			line = line + averagedPerformanceArray[i];
+			if(i < averagedPerformanceArray.length - 1)
+				line = line + ",";
+		}
+		System.out.println(line);
+		bw.write(line);
+		bw.close();
+	}
+	public static void latencyBarChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
+	{
+		// Output settings.
+		String algoString;
+		switch(algo)
+		{
+			case 0:
+				algoString = "DA";
+				break;
+			case 1:
+				algoString = "Random";
+				break;
+			case 2:
+				algoString = "Boston";
+				break;
+			case 3:
+				algoString = "WOIntra";
+				break;
+			default:
+				algoString = "--";
+				break;
+		}
+		
+		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "LatencyBarChart"+ ".csv";		
 		
 		File outputDir = new File(outputDirectory);
 		if (!outputDir.exists())	outputDir.mkdir();	    

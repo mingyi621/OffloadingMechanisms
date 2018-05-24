@@ -11,15 +11,15 @@ public class Main {
 	public static void main(String[] args) throws IOException
 	{
 		bulkSetDataProcessor();
-//		oneSetDataProcessor(8, 10, 5, 0); // UE, server, ordinal, algo
+//		oneSetDataProcessor(10, 2, 0, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 50, 1000 };	// Both inclusion
+		int[] UERange = { 500, 500 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 50;
 		
 		for(int algo = 0; algo <= 3; algo++)
 		{
@@ -28,18 +28,29 @@ public class Main {
 				for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
 				{
 					List<double[]> performance = new ArrayList<>();
+					List<double[]> barChartPerformance = new ArrayList<>();
+					List<double[]> latencyBarChartPerformance = new ArrayList<>();
 					for(int ordinal = 0; ordinal < numberOfSetForEachUE; ordinal++)
 					{
-						double[] onePerformanceArray = oneSetDataProcessor(UE, server, ordinal, algo);
+						List<double[]> p = oneSetDataProcessor(UE, server, ordinal, algo);
+						double[] onePerformanceArray = p.get(0);
+						double[] oneBarChartArray = p.get(1);
+						double[] oneLatencyBarChartArray = p.get(2);
 						performance.add(onePerformanceArray);
+						barChartPerformance.add(oneBarChartArray);
+						latencyBarChartPerformance.add(oneLatencyBarChartArray);
 					}
 					double[] averagedPerformanceArray = PerformanceEvaluation.performanceAverager(performance);
+					double[] averagedBarChartArray = PerformanceEvaluation.performanceAverager(barChartPerformance);
+					double[] averagedLatencyBarChartArray = PerformanceEvaluation.performanceAverager(latencyBarChartPerformance);
 					PerformanceEvaluation.performanceOutputFile(UE, server, algo, averagedPerformanceArray);
+					PerformanceEvaluation.barChartPerformanceOutputFile(UE, server, algo, averagedBarChartArray);
+					PerformanceEvaluation.latencyBarChartPerformanceOutputFile(UE, server, algo, averagedLatencyBarChartArray);
 				}
 			}	
 		}
 	}
-	public static double[] oneSetDataProcessor(int UE, int server, int ordinal, int algo) throws IOException
+	public static List<double[]> oneSetDataProcessor(int UE, int server, int ordinal, int algo) throws IOException
 	{
 		// Basic input settings.
 //		int UE = 40;
@@ -137,6 +148,8 @@ public class Main {
 		// Write To File
 		WriteToFile(ueList, serverList, outputPath);
 		
+		List<double[]> multiPerformance = new ArrayList<>(); // For performance array and bar chart array
+		
 		double[] performance = new double[9];
 		// Performance evaluation.
 		performance[0] = PerformanceEvaluation.averageOfPreference(ueList, serverList);
@@ -148,8 +161,15 @@ public class Main {
 		performance[6] = PerformanceEvaluation.percentageOfOutsourcing(ueList, serverList);
 		performance[7] = PerformanceEvaluation.averageOfPreferenceOfAcceptUEs(ueList, serverList);
 		performance[8] = PerformanceEvaluation.standardDeviationOfPreferenceOfAcceptedUEs(ueList, serverList);
+		multiPerformance.add(performance);
 		
-		return performance;
+		double[] barChartPerformance = PerformanceEvaluation.preferenceCountDistribution(ueList, serverList);
+		multiPerformance.add(barChartPerformance);
+		
+		double[] latencyBarChartPerformance = PerformanceEvaluation.latencyCountDistribution(ueList, serverList);
+		multiPerformance.add(latencyBarChartPerformance);
+		
+		return multiPerformance;
 	}
 	public static List<UE> ReadUE(String file) throws IOException
 	{

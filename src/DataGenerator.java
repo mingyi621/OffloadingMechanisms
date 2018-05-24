@@ -12,15 +12,15 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 		bulkSetDataGenerator();
-//		oneSetDataGenerator(2000, 1, 1); // UE, Server, Ordinal
+//		oneSetDataGenerator(10, 2, 0); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
-		int[] UERange = { 50, 1000 };	// Both inclusion
+		int[] UERange = { 100, 100 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 50;
 
 		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 		{
