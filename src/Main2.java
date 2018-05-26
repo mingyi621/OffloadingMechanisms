@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 
-public class Main {
+public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataProcessor();
-//		oneSetDataProcessor(10, 2, 0, 0); // UE, server, ordinal, algo
+//		bulkSetDataProcessor();
+		oneSetDataProcessor(50, 10, 0, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
@@ -52,7 +52,7 @@ public class Main {
 		String inputLatencyPath = "input/" + "latency/" + "UE" + UE + "-" + "server" + server + "/" + "latency" + ordinal +".csv";
 		
 		// Output settings.
-		String outputDirectory = "output/" + algoString + "/" +  "UE" + UE + "-" + "server" + server + "/" ;
+		String outputDirectory = "output/" + "inter" + "/" + algoString + "/" +  "UE" + UE + "-" + "server" + server + "/" ;
 		String outputFile = "output" + ordinal +".csv";	
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);    
@@ -74,6 +74,22 @@ public class Main {
 				latency[j] = Double.parseDouble(record[j]);
 			}
 			ueList.get(i).setLatency(latency);
+		}
+		
+		// For inter: 1.1 Set Ask Array from the Servers, and initialize the bidArray as the askArray, and the utilityArray
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			ueList.get(i).setAskArray(serverList);
+			double[] bidArray = new double[serverList.size()];
+			System.arraycopy(ueList.get(i).getAskArray(), 0, bidArray, 0, ueList.get(i).getAskArray().length);
+			ueList.get(i).setBidArray(bidArray);
+			ueList.get(i).initializeUtilityArray();
+		}
+		
+		// For inter: 1.2 Set utilityArray of the servers.
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			serverList.get(i).setUtilityArray(ueList, i);
 		}
 		
 		// 2. Set UEs' Preference List
@@ -134,8 +150,9 @@ public class Main {
 			double memory = Double.parseDouble(record[1]);
 			double storage = Double.parseDouble(record[2]);
 			double maxLatency = Double.parseDouble(record[3]);
+			double valuation = Double.parseDouble(record[4]);
 			double[] demand = {cpu, memory, storage};
-			UE ue = new UE(demand, maxLatency);
+			UE ue = new UE(demand, maxLatency, valuation);
 			
 			list.add(ue);
 		}
@@ -156,7 +173,11 @@ public class Main {
 			double memory = Double.parseDouble(record[1]);
 			double storage = Double.parseDouble(record[2]);
 			double[] capacity = {cpu, memory, storage};
-			Server server = new Server(capacity);
+			double costPerCpu = Double.parseDouble(record[3]);
+			double costPerMemory = Double.parseDouble(record[4]);
+			double costPerStorage = Double.parseDouble(record[5]);
+			double[] costPerResourceArray = {costPerCpu, costPerMemory, costPerStorage};
+			Server server = new Server(capacity, costPerResourceArray);
 			list.add(server);
 		}
 		

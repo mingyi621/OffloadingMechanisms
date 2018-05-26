@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.List;
 
 public class Function 
@@ -136,5 +137,18 @@ public class Function
 				break;
 		}
 		return algoString;
+	}
+	public static void checkDirectoryWhetherExist(String directory)
+	{
+		String[] separatedDirectory = directory.split("/");
+		
+		String outputDirectory = "";
+		for(int i = 0; i < separatedDirectory.length; i++)
+		{
+			outputDirectory = outputDirectory + separatedDirectory[i] + "/";
+			File outputDir = new File(outputDirectory);
+			if (!outputDir.exists())	
+				outputDir.mkdir();
+		}
 	}
 }

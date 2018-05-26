@@ -123,25 +123,7 @@ public class ShowBarChart extends JFrame{
 	   
 	   for(int algo = 0; algo <= 3; algo++)
 	   {
-		   String algoString;
-		   switch(algo)
-		   {
-		   		case 0: 
-		   			algoString = "DA";
-   					break;
-   				case 1:
-   					algoString = "Random";
-   					break;
-   				case 2:
-   					algoString = "Boston";
-   					break;
- 				case 3:
-   					algoString = "WOIntra";
-   					break;
-   				default:
-   					algoString = "--";
-   					break;
-   			}
+		   	String algoString = Function.algoNumberToAlgoStream(algo);
    	
    			String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
    			FileReader fr = new FileReader(filePath);

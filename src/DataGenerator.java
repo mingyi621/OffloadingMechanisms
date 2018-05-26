@@ -11,8 +11,8 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataGenerator();
-//		oneSetDataGenerator(10, 2, 0); // UE, Server, Ordinal
+//		bulkSetDataGenerator();
+		oneSetDataGenerator(50, 10, 0); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
@@ -20,7 +20,7 @@ public class DataGenerator
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 50;
+		int numberOfSetForEachUE = 10;
 
 		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 		{
@@ -50,26 +50,25 @@ public class DataGenerator
 		String serverFileName = "server" + ordinal +".csv";
 		String latencyDirectory = "input/" + "latency/" + "UE" + Integer.toString(UE) + "-" + "server" + Integer.toString(server);
 		String latencyFileName = "latency" + ordinal + ".csv";
-			    
-		File UEdir = new File(UEdirectory);
-		if (!UEdir.exists())	UEdir.mkdir();	    
-		File serverDir = new File(serverDirectory);
-		if (!serverDir.exists())	serverDir.mkdirs();
-		File latencyDir = new File(latencyDirectory);
-		if (!latencyDir.exists())	latencyDir.mkdirs();
+		
+		Function.checkDirectoryWhetherExist(UEdirectory);
+		Function.checkDirectoryWhetherExist(serverDirectory);
+		Function.checkDirectoryWhetherExist(latencyDirectory);
 			        
 		String outputUEPath = UEdirectory + "/" + UEfileName;
 		String outputServerPath = serverDirectory + "/" + serverFileName;
 		String outputLatencyPath = latencyDirectory + "/" + latencyFileName;
 				
-				// Process UE files.
+		// Process UE files.
 		List<double[]> requestList = generateRequest(UE);
 		List<int[]> maxLatencyList = generateMaxLatency(UE, percentage, maxLatencyRange, area);	
-		writeToUEFile(outputUEPath, requestList, maxLatencyList);	
+		List<double[]> valuationList = generateValuation(requestList);
+		writeToUEFile(outputUEPath, requestList, maxLatencyList, valuationList);	
 				
 		// Process server files.
 		List<double[]> serverList = generateServer(server);
-		writeToServerFile(outputServerPath, serverList);	
+		List<double[]> costArrayOfServerList = generateCostArrayOfServer(server);
+		writeToServerFile(outputServerPath, serverList, costArrayOfServerList);	
 				
 		// Process latency files.
 //		List<int[]> latencyList = generateLatencyList(UE, server, area);
@@ -137,6 +136,29 @@ public class DataGenerator
 		System.out.println();
 		return list;
 	}
+	public static List<double[]> generateValuation(List<double[]> requestList)
+	{
+		List<double[]> list = new ArrayList<>();
+		Random random = new Random();
+		
+		System.out.println("Generating valuation:");
+		for(int i = 0; i < requestList.size(); i++)
+		{
+			double[] requestArray = requestList.get(i);
+			double[] unitValuation = new double[3];
+			do{
+				unitValuation[0] = 60 + 10 * random.nextGaussian();
+				unitValuation[1] = 6 + 1 * random.nextGaussian();
+				unitValuation[2] = 0.06 + 0.01 * random.nextGaussian();
+			}while(unitValuation[0] <= 0 || unitValuation[1] <= 0 || unitValuation[2] <= 0);
+			
+			double[] valuation = {requestArray[0] * unitValuation[0]
+							 	+ requestArray[1] * unitValuation[1]
+							 	+ requestArray[2] * unitValuation[2]};
+			list.add(valuation);
+		}
+		return list;
+	}
 	public static void test()
 	{
 		Random random = new Random();
@@ -161,7 +183,7 @@ public class DataGenerator
 			System.out.printf("%d,%d,%d,%d\n", zero, one, two, three);
 		}
 	}
-	public static void writeToUEFile(String outputFile, List<double[]> requestList, List<int[]> maxLatencyList) throws IOException
+	public static void writeToUEFile(String outputFile, List<double[]> requestList, List<int[]> maxLatencyList, List<double[]> valuationList) throws IOException
 	{
 		FileWriter w = new FileWriter(outputFile);
 		BufferedWriter bw = new BufferedWriter(w);
@@ -170,10 +192,11 @@ public class DataGenerator
 		System.out.println("Writing UE files:");
 		for(int i = 0; i < requestList.size(); i++)
 		{ 
-			row = String.valueOf(requestList.get(i)[0]) + ","
-				+ String.valueOf(requestList.get(i)[1]) + ","
-				+ String.valueOf(requestList.get(i)[2]) + ","
-				+ String.valueOf(maxLatencyList.get(i)[0]);
+			row = requestList.get(i)[0] + ","
+				+ requestList.get(i)[1] + ","
+				+ requestList.get(i)[2] + ","
+				+ maxLatencyList.get(i)[0] + ","
+				+ valuationList.get(i)[0];
 			System.out.println(row);
 			bw.write(row);
 			bw.newLine();
@@ -203,7 +226,24 @@ public class DataGenerator
 		System.out.println();
 		return list;
 	}
-	public static void writeToServerFile(String outputFile, List<double[]> serverList) throws IOException
+	public static List<double[]> generateCostArrayOfServer(int server)
+	{
+		List<double[]> list = new ArrayList<>();
+		Random random = new Random();
+		
+		for(int i = 0; i < server; i++)
+		{
+			double[] costArray = new double[3];
+			do{
+				costArray[0] = 40 + 10 * random.nextGaussian();
+				costArray[1] = 4 + 1 * random.nextGaussian();
+				costArray[2] = 0.04 + 0.01 * random.nextGaussian();
+			}while(costArray[0] < 0 || costArray[1] < 0 || costArray[2] < 0);
+			list.add(costArray);
+		}		
+		return list;
+	}
+	public static void writeToServerFile(String outputFile, List<double[]> serverList, List<double[]> costArrayOfServerList) throws IOException
 	{
 		FileWriter w = new FileWriter(outputFile);
 		BufferedWriter bw = new BufferedWriter(w);
@@ -211,9 +251,12 @@ public class DataGenerator
 		System.out.println("Writing servers:");
 		for(int i = 0; i < serverList.size(); i++)
 		{ 
-			String row = String.valueOf(serverList.get(i)[0]) + ","
-					   + String.valueOf(serverList.get(i)[1]) + ","
-				       + String.valueOf(serverList.get(i)[2]);
+			String row = serverList.get(i)[0] + ","
+					   + serverList.get(i)[1] + ","
+				       + serverList.get(i)[2] + ","
+				       + costArrayOfServerList.get(i)[0] + ","
+				       + costArrayOfServerList.get(i)[1] + ","
+				       + costArrayOfServerList.get(i)[2];
 			System.out.println(row);
 			bw.write(row);
 			bw.newLine();

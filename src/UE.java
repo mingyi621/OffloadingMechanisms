@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.List;
 
 public class UE implements Serializable
 {
@@ -12,11 +13,26 @@ public class UE implements Serializable
 	
 	boolean accept = false;
 	
+	// For inter-offloading
+	double valuation;
+	double[] askArray;
+	double[] bidArray;
+	double[] utilityArray;
+	
+	// Constructor for intra-offloading
 	public UE(double[] d, double max)
 	{
 		setDemand(d);
 		setMaximumLatency(max);
 	}
+	// Construtor for inter-offloading
+	public UE(double[] d, double max, double value)
+	{
+		setDemand(d);
+		setMaximumLatency(max);
+		setValuation(value);
+	}
+	
 	
 	public void setDemand(double[] d)
 	{
@@ -136,5 +152,59 @@ public class UE implements Serializable
 			System.out.printf("%d ", getPreference()[i]);
 		}
 		System.out.println();
+	}
+	
+	// below for inter-offloading
+	public void setValuation(double v)
+	{
+		valuation = v;
+	}
+	public double getValuation()
+	{
+		return valuation;
+	}
+	public void setAskArray(double[] a)
+	{
+		askArray = a;
+	}
+	public void setAskArray(List<Server> serverList)
+	{
+		double[] askArray = new double[serverList.size()];
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			double[] costArray = serverList.get(i).getCostArray();
+			double[] demand = getDemand();
+			askArray[i] = demand[0] * costArray[0] + demand[1] * costArray[1] + demand[2] * costArray[2];			
+		}
+		setAskArray(askArray);
+	}
+	public double[] getAskArray()
+	{
+		return askArray;
+	}
+	public void setBidArray(double[] b)
+	{
+		bidArray = b;
+	}
+	public double[] getBidArray()
+	{
+		return bidArray;
+	}
+	public void setUtilityArray(double[] u)
+	{
+		utilityArray = u;
+	}
+	public void initializeUtilityArray()
+	{
+		utilityArray = new double[getBidArray().length];
+		for(int i = 0; i < utilityArray.length; i++)
+		{	
+			int w = 1;
+			utilityArray[i] = getValuation() - w * getLatency()[i] - getBidArray()[i];
+		}
+	}
+	public double[] getUtilityArray()
+	{
+		return utilityArray;
 	}
 }

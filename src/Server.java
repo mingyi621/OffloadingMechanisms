@@ -14,13 +14,29 @@ public class Server implements Serializable
 	
 	List<UE> servedUEList = new ArrayList<>();
 	
-	public Server(double[] c)
+	// for inter-offloading
+	double[] costArray;
+	double[] utilityArray;
+ 	
+	// Constructor for intra-offloading
+	public Server(double[] capacity)
 	{
-		setCapacity(c);
+		setCapacity(capacity);
 		setWeight(1);
 		setAlpha(1);
 		setUsed();
 	}
+	
+	// Constructor for inter-offloading
+	public Server(double[] capacity, double[] cost)
+	{
+		setCapacity(capacity);
+		setWeight(1);
+		setAlpha(1);
+		setUsed();
+		setCostArray(cost);
+	}
+	
 	public void setCapacity(double[] c)
 	{
 		capacity = new double[c.length];
@@ -156,5 +172,33 @@ public class Server implements Serializable
 	public List<UE> getServedUEList()
 	{
 		return servedUEList;
+	}
+	
+	// below for inter-offloading
+	public void setCostArray(double[] c)
+	{
+		costArray = c;
+	}
+	public double[] getCostArray()
+	{
+		return costArray;
+	}
+	public void setUtilityArray(List<UE> ueList, int whichServer)
+	{
+		utilityArray = new double[ueList.size()];
+		for(int i = 0; i < utilityArray.length; i++)
+		{
+			utilityArray[i] = ueList.get(i).getBidArray()[whichServer] 
+							- costValueOfDemand(ueList.get(i).getDemand()) 
+							- preferenceFunction(weight, ueList.get(i).getDemand(), capacity, alpha);
+		}
+	}
+	public double[] getUtilityArray()
+	{
+		return utilityArray;
+	}
+	public double costValueOfDemand(double[] demand)
+	{
+		return demand[0] * getCostArray()[0] + demand[1] * getCostArray()[1] + demand[2] * getCostArray()[2];
 	}
 }

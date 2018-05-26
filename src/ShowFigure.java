@@ -29,7 +29,6 @@ public class ShowFigure extends ApplicationFrame
 		RefineryUtilities.centerFrameOnScreen(demo);
 		demo.setVisible(true);
 	}
-	
 	public ShowFigure(int c) throws IOException
 	{
         super(columnIndextoString(c)[0]);
@@ -61,8 +60,7 @@ public class ShowFigure extends ApplicationFrame
         chartPanel.setPreferredSize(new java.awt.Dimension(800, 800));
         setContentPane(chartPanel);
 
-    }
-	
+    }	
 	public static XYDataset readFile(int c) throws IOException
     {
     	XYSeries series0 = new XYSeries("DA");
@@ -82,25 +80,7 @@ public class ShowFigure extends ApplicationFrame
 			{
     			for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
     			{
-    				String algoString;
-    				switch(algo)
-    				{
-    					case 0: 
-    						algoString = "DA";
-    						break;
-    					case 1:
-    						algoString = "Random";
-    						break;
-    					case 2:
-    						algoString = "Boston";
-    						break;
-    					case 3:
-    						algoString = "WOIntra";
-    						break;
-    					default:
-    						algoString = "--";
-    						break;
-    				}
+    				String algoString = Function.algoNumberToAlgoStream(algo);
     	
     				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
     				FileReader fr = new FileReader(filePath);
@@ -188,6 +168,5 @@ public class ShowFigure extends ApplicationFrame
 				break;
 		}
 		return result;
-	}
-	
+	}	
 }
