@@ -12,7 +12,7 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 //		bulkSetDataGenerator();
-		oneSetDataGenerator(50, 10, 0); // UE, Server, Ordinal
+		oneSetDataGenerator(5, 2, 1); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{

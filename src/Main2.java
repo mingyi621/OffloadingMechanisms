@@ -13,7 +13,7 @@ public class Main2 {
 	public static void main(String[] args) throws IOException
 	{
 //		bulkSetDataProcessor();
-		oneSetDataProcessor(50, 10, 0, 0); // UE, server, ordinal, algo
+		oneSetDataProcessor(11, 4, 1, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
@@ -76,7 +76,7 @@ public class Main2 {
 			ueList.get(i).setLatency(latency);
 		}
 		
-		// For inter: 1.1 Set Ask Array from the Servers, and initialize the bidArray as the askArray, and the utilityArray
+		// For inter: 1.1 Set Ask Array from the Servers, and initialize the bidArray as the askArray, and the utilityArray of UEs
 		for(int i = 0; i < ueList.size(); i++)
 		{
 			ueList.get(i).setAskArray(serverList);
@@ -90,29 +90,30 @@ public class Main2 {
 		for(int i = 0; i < serverList.size(); i++)
 		{
 			serverList.get(i).setUtilityArray(ueList, i);
+			serverList.get(i).showUtilityArray(i);
 		}
 		
-		// 2. Set UEs' Preference List
-		for(int i = 0; i < ueList.size(); i++)
-		{
-			ueList.get(i).setPreference();
-			System.out.printf("Preference list of UE %d: ",i);
-			ueList.get(i).showPreference();
-		}
-		
-		
-		// 3. Set Servers' Preference List
-		for(int i = 0; i < serverList.size(); i++)
-		{
-			serverList.get(i).setPreference(ueList);
-			System.out.printf("Preference list of server %d: ",i);
-			serverList.get(i).showPreference();
-		}
+//		// 2. Set UEs' Preference List
+//		for(int i = 0; i < ueList.size(); i++)
+//		{
+//			ueList.get(i).setPreference();
+//			System.out.printf("Preference list of UE %d: ",i);
+//			ueList.get(i).showPreference();
+//		}
+//		
+//		
+//		// 3. Set Servers' Preference List
+//		for(int i = 0; i < serverList.size(); i++)
+//		{
+//			serverList.get(i).setPreference(ueList);
+//			System.out.printf("Preference list of server %d: ",i);
+//			serverList.get(i).showPreference();
+//		}
 		
 		switch(algo)
 		{
 			case 0:
-				deferredAcceptanceAlgorithm(ueList, serverList);
+				deferredAcceptanceAlgorithmWithTransfer(ueList, serverList);
 				break;
 		
 			case 1:
@@ -265,6 +266,110 @@ public class Main2 {
 			System.out.println();
 		}
 	}
+	public static void deferredAcceptanceAlgorithmWithTransfer(List<UE> ueList, List<Server> serverList)
+	{
+		boolean globalRejection;
+//		int count = 0;
+		do{
+//			count ++;
+			globalRejection = false;
+			for(int i = 0; i < ueList.size(); i++)
+			{
+				if((ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() == -1))
+				{
+					int theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
+					ueList.get(i).setProposeTo(theBiggestIndex);
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					ueList.get(i).setPreferenceCount(1);
+					ueList.get(i).showValuation(i);
+					ueList.get(i).showBidArray(i);
+					ueList.get(i).showLatency(i);
+					ueList.get(i).showUtilityArray(i);	
+					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+				}
+				else if(ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() > -1 && ueList.get(i).getProposeTo() != -1)
+				{
+					int theBiggestIndex = ueList.get(i).getProposeTo();
+					double[] bidArray = ueList.get(i).getBidArray();
+					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon();
+					ueList.get(i).setBidArray(bidArray);
+					ueList.get(i).refreshUtilityArray();
+					theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
+					ueList.get(i).setProposeTo(theBiggestIndex);
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					ueList.get(i).setPreferenceCount(1);
+					ueList.get(i).showValuation(i);
+					ueList.get(i).showBidArray(i);
+					ueList.get(i).showLatency(i);
+					ueList.get(i).showUtilityArray(i);
+					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+				}	
+			}
+			for(int i = 0; i < serverList.size(); i++)
+			{
+				serverList.get(i).setOrderArrayOfIndexOfUEs();
+				serverList.get(i).showOrderArrayOfIndexOfUEs(i);
+				double[] used = new double[serverList.get(i).getCapacity().length];
+				for(int j = 0; j < used.length; j++)
+				{
+					used[j] = 0;
+					serverList.get(i).setUsed();
+				}
+				boolean accept = true;
+				for(int j = 0; j < serverList.get(i).getUtilityArray().length; j++)
+				{
+					int proposer = (int)serverList.get(i).getOrderArrayOfIndexOfUEs()[j];
+					if(ueList.get(proposer).getProposeTo() == i)
+					{
+						if(accept)
+						{
+							for(int k = 0; k < serverList.get(i).getCapacity().length; k++)
+							{
+								if(used[k] + ueList.get(proposer).getDemand()[k] > serverList.get(i).getCapacity()[k])
+								{
+									accept = false;
+									globalRejection = true;
+									System.out.println("\n The capacity is full.");
+									break;
+								}
+							}
+						}
+						if(accept)
+						{
+							for(int k = 0; k < serverList.get(i).getCapacity().length; k++)
+							{
+								used[k] += ueList.get(proposer).getDemand()[k];
+							}
+							serverList.get(i).setUsed(ueList.get(proposer).getDemand());
+							ueList.get(proposer).setAccept(true);
+							System.out.printf("UE %d is accepted by server %d.\n", proposer, i);
+						}
+						else
+						{
+							ueList.get(proposer).setAccept(false);
+							System.out.printf("UE %d is rejected by server %d.\n", proposer, i);
+						}
+					}
+				}
+			}
+		}while(globalRejection);
+//		}while(count <= 5);
+		// Set each server's servedUEList.
+		for(int i = 0; i < serverList.size(); i++)
+		{
+			System.out.printf("Server %d accepted UE ", i);
+			for(int j = 0; j < ueList.size(); j++)
+			{
+				if(ueList.get(j).getAccept() == true && ueList.get(j).getProposeTo() == i)
+				{
+					serverList.get(i).addServedUEList(ueList.get(j));
+					System.out.printf("%d ", j);
+				}
+			}
+			System.out.println();
+		}
+	}
+	
 	public static void RandomAlgorithm(List<UE> ueList, List<Server> serverList)
 	{
 		Random ra = new Random();

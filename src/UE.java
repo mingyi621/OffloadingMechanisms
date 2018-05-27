@@ -18,6 +18,7 @@ public class UE implements Serializable
 	double[] askArray;
 	double[] bidArray;
 	double[] utilityArray;
+	double epsilon;
 	
 	// Constructor for intra-offloading
 	public UE(double[] d, double max)
@@ -31,6 +32,7 @@ public class UE implements Serializable
 		setDemand(d);
 		setMaximumLatency(max);
 		setValuation(value);
+		setEpsilon(1);
 	}
 	
 	
@@ -69,6 +71,15 @@ public class UE implements Serializable
 		for(int i = 0; i < getLatency().length; i++)
 		{
 			System.out.printf("%.0f ", getLatency()[i]);
+		}
+		System.out.println();
+	}
+	public void showLatency(int ue)
+	{
+		System.out.printf("UE %d's latency array: ", ue);
+		for(int i = 0; i < getLatency().length; i++)
+		{
+			System.out.printf("%.0f, ", getLatency()[i]);
 		}
 		System.out.println();
 	}
@@ -163,6 +174,10 @@ public class UE implements Serializable
 	{
 		return valuation;
 	}
+	public void showValuation(int ue)
+	{
+		System.out.printf("UE %d's valuation = %.2f\n", ue, getValuation());
+	}
 	public void setAskArray(double[] a)
 	{
 		askArray = a;
@@ -190,6 +205,15 @@ public class UE implements Serializable
 	{
 		return bidArray;
 	}
+	public void showBidArray(int ue)
+	{
+		System.out.printf("UE %d's bid array: ", ue);
+		for(int i = 0; i < bidArray.length; i++)
+		{
+			System.out.printf("%.2f, ", bidArray[i]);
+		}
+		System.out.println();
+	}
 	public void setUtilityArray(double[] u)
 	{
 		utilityArray = u;
@@ -197,14 +221,56 @@ public class UE implements Serializable
 	public void initializeUtilityArray()
 	{
 		utilityArray = new double[getBidArray().length];
+		refreshUtilityArray();
+	}
+	public void refreshUtilityArray()
+	{
 		for(int i = 0; i < utilityArray.length; i++)
 		{	
 			int w = 1;
-			utilityArray[i] = getValuation() - w * getLatency()[i] - getBidArray()[i];
+			if(getLatency()[i] > getMaximumLatency())
+			{
+				utilityArray[i] = 0;
+			}
+			else
+			{
+				utilityArray[i] = getValuation() - w * getLatency()[i] - getBidArray()[i];
+			}
 		}
 	}
 	public double[] getUtilityArray()
 	{
 		return utilityArray;
+	}
+	public void showUtilityArray(int ue)
+	{
+		System.out.printf("UE %d's utility array: ", ue);
+		for(int i = 0; i < utilityArray.length; i++)
+		{
+			System.out.printf("%.2f, ", utilityArray[i]);
+		}
+		System.out.println();
+	}
+	public int checkTheBiggestIndexInUtilityArray()
+	{
+		int theBiggestIndex = -1;
+		double theBiggestUtilityValue = -1;
+		for(int i = 0; i < getUtilityArray().length; i++)
+		{
+			if(getUtilityArray()[i] > theBiggestUtilityValue && getUtilityArray()[i] >= 0)
+			{
+				theBiggestIndex = i;
+				theBiggestUtilityValue = getUtilityArray()[i];
+			}
+		}
+		return theBiggestIndex;
+	}
+	public void setEpsilon(int e)
+	{
+		epsilon = e;
+	}
+	public double getEpsilon()
+	{
+		return epsilon;
 	}
 }

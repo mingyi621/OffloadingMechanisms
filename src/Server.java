@@ -17,6 +17,7 @@ public class Server implements Serializable
 	// for inter-offloading
 	double[] costArray;
 	double[] utilityArray;
+	double[] orderArrayOfIndexOfUEs;
  	
 	// Constructor for intra-offloading
 	public Server(double[] capacity)
@@ -197,8 +198,41 @@ public class Server implements Serializable
 	{
 		return utilityArray;
 	}
+	public void showUtilityArray(int s)
+	{
+		System.out.printf("The utility of Server %d: ", s);
+		for(int i = 0; i < utilityArray.length; i++)
+		{
+			System.out.printf("%.2f, ", utilityArray[i]);
+		}
+		System.out.println();
+	}
 	public double costValueOfDemand(double[] demand)
 	{
 		return demand[0] * getCostArray()[0] + demand[1] * getCostArray()[1] + demand[2] * getCostArray()[2];
+	}
+	public void setOrderArrayOfIndexOfUEs()
+	{
+		orderArrayOfIndexOfUEs = new double[getUtilityArray().length];
+		for(int i = 0; i < orderArrayOfIndexOfUEs.length; i++)
+		{
+			orderArrayOfIndexOfUEs[i] = i;
+		}
+		double[] tempUtilityArray = new double[utilityArray.length];
+		System.arraycopy(utilityArray, 0, tempUtilityArray, 0, utilityArray.length);
+		Function.inverseMergeSort(tempUtilityArray, orderArrayOfIndexOfUEs);
+	}
+	public double[] getOrderArrayOfIndexOfUEs()
+	{
+		return orderArrayOfIndexOfUEs;
+	}
+	public void showOrderArrayOfIndexOfUEs(int s)
+	{
+		System.out.printf("The server %d's order array: ", s);
+		for(int i = 0; i < orderArrayOfIndexOfUEs.length; i++)
+		{
+			System.out.printf("%.0f, ", orderArrayOfIndexOfUEs[i]);
+		}
+		System.out.println();
 	}
 }
