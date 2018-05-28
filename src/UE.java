@@ -32,7 +32,7 @@ public class UE implements Serializable
 		setDemand(d);
 		setMaximumLatency(max);
 		setValuation(value);
-		setEpsilon(1);
+		setEpsilon(10);
 	}
 	
 	
@@ -230,7 +230,7 @@ public class UE implements Serializable
 			int w = 1;
 			if(getLatency()[i] > getMaximumLatency())
 			{
-				utilityArray[i] = 0;
+				utilityArray[i] = -1;
 			}
 			else
 			{

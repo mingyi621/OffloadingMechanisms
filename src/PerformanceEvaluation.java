@@ -21,7 +21,7 @@ public class PerformanceEvaluation
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 50;
+		int numberOfSetForEachUE = 10;
 		
 		for(int algo = 0; algo <= 3; algo++)
 		{

@@ -187,16 +187,20 @@ public class Server implements Serializable
 	public void setUtilityArray(List<UE> ueList, int whichServer)
 	{
 		utilityArray = new double[ueList.size()];
-		for(int i = 0; i < utilityArray.length; i++)
-		{
-			utilityArray[i] = ueList.get(i).getBidArray()[whichServer] 
-							- costValueOfDemand(ueList.get(i).getDemand()) 
-							- preferenceFunction(weight, ueList.get(i).getDemand(), capacity, alpha);
-		}
+		refreshUtilityArray(ueList, whichServer);
 	}
 	public double[] getUtilityArray()
 	{
 		return utilityArray;
+	}
+	public void refreshUtilityArray(List<UE> ueList, int whichServer)
+	{
+		for(int i = 0; i < utilityArray.length; i++)
+		{
+			utilityArray[i] = ueList.get(i).getBidArray()[whichServer] 
+							- costValueOfDemand(ueList.get(i).getDemand())
+							- preferenceFunction(weight, ueList.get(i).getDemand(), capacity, alpha);
+		}
 	}
 	public void showUtilityArray(int s)
 	{

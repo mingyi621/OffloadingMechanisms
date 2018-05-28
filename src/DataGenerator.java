@@ -12,7 +12,7 @@ public class DataGenerator
 	public static void main(String[] args) throws IOException
 	{
 //		bulkSetDataGenerator();
-		oneSetDataGenerator(5, 2, 1); // UE, Server, Ordinal
+		oneSetDataGenerator(100, 4, 1); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
@@ -432,7 +432,7 @@ public class DataGenerator
 			}
 			distance.add(row);			
 		}
-//		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
 		return distance;
 	}	
 	public static void writeToLatencyFile(String outputFile, List<int[]> latencyList) throws IOException
