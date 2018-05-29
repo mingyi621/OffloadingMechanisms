@@ -11,16 +11,16 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
-//		bulkSetDataGenerator();
-		oneSetDataGenerator(100, 4, 1); // UE, Server, Ordinal
+		bulkSetDataGenerator();
+//		oneSetDataGenerator(100, 4, 1); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
-		int[] UERange = { 50, 100 };	// Both inclusion
+		int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 100;
 
 		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 		{
@@ -432,7 +432,7 @@ public class DataGenerator
 			}
 			distance.add(row);			
 		}
-		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+//		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
 		return distance;
 	}	
 	public static void writeToLatencyFile(String outputFile, List<int[]> latencyList) throws IOException

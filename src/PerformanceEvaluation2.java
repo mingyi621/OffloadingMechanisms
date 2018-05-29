@@ -5,10 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-public class PerformanceEvaluation 
+public class PerformanceEvaluation2 
 {
 	public static void main(String[] args) throws ClassNotFoundException, IOException
 	{
@@ -17,13 +16,13 @@ public class PerformanceEvaluation
 	}
 	public static void bulkSetDataProcessor() throws ClassNotFoundException, IOException
 	{
-		int[] UERange = { 50, 1000 };	// Both inclusion
+		int[] UERange = { 50, 200 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 100;
+		int numberOfSetForEachUE = 2;
 		
-		for(int algo = 0; algo <= 3; algo++)
+		for(int algo = 0; algo <= 2; algo++)
 		{
 			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{	
@@ -60,22 +59,23 @@ public class PerformanceEvaluation
 		List<UE> ueList = ueListReader(ue, server, ordinal, algo);
 		List<Server> serverList = serverListReader(ue, server, ordinal, algo);
 		
-		double[] performance = new double[9];
+		double[] performance = new double[10];
 		performance[0] = averageOfPreference(ueList, serverList);
 		performance[1] = standardDeviationOfPreference(ueList, serverList);
 		performance[2] = balanceIndexOfServers(ueList, serverList);
-		performance[3] = averageLatency(ueList, serverList);
+		performance[3] = averageLatencyForInter(ueList, serverList); // Only for inter
 		performance[4] = avergeServedUEs(ueList, serverList);
-		performance[5] = standardDeviationOfServedLatency(ueList, serverList);
-		performance[6] = percentageOfOutsourcing(ueList, serverList);
+		performance[5] = standardDeviationOfServedLatencyForInter(ueList, serverList); // Only for inter
+		performance[6] = 0; //percentageOfOutsourcing(ueList, serverList);
 		performance[7] = averageOfPreferenceOfAcceptUEs(ueList, serverList);
 		performance[8] = standardDeviationOfPreferenceOfAcceptedUEs(ueList, serverList);
+		performance[9] = averageRevenueOfTheServers(ueList, serverList);
 		multiPerformance.add(performance);
 		
-		double[] barChartPerformance = preferenceCountDistribution(ueList, serverList);
-		multiPerformance.add(barChartPerformance);
+		double[] barChartPerformance = preferenceCountDistributionForInter(ueList, serverList);  //useless for inter
+		multiPerformance.add(barChartPerformance);	//useless for inter
 		
-		double[] latencyBarChartPerformance = latencyCountDistribution(ueList, serverList);
+		double[] latencyBarChartPerformance = latencyCountDistributionForInter(ueList, serverList);
 		multiPerformance.add(latencyBarChartPerformance);
 		
 		return multiPerformance;	
@@ -121,6 +121,7 @@ public class PerformanceEvaluation
 		System.out.println("Balance index = " + result);
 		return result;
 	}
+	
 	public static double averageLatency(List<UE> ueList, List<Server> serverList)
 	{
 		for(int i = 0; i < ueList.size(); i++)
@@ -165,6 +166,21 @@ public class PerformanceEvaluation
 		System.out.printf("overall latency = %.0f, count = %d, average latency = %.2f\n", overallLatency, acceptedUECount, result);
 		return result;
 	}
+	public static double averageLatencyForInter(List<UE> ueList, List<Server> serverList)
+	{
+		double overallLatency = 0;
+		int acceptedUECount = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				overallLatency += ueList.get(i).getLatency()[ueList.get(i).getProposeTo()];
+				acceptedUECount++;
+			}
+		}
+		return overallLatency / acceptedUECount;
+	}
+	
 	public static double avergeServedUEs(List<UE> ueList, List<Server> serverList)
 	{
 		double result = 0;
@@ -180,7 +196,6 @@ public class PerformanceEvaluation
 	}
 	public static double standardDeviationOfServedLatency(List<UE> ueList, List<Server> serverList)
 	{
-		double result = 0;
 		List<Double> latency = new ArrayList<>();
 		for(int i = 0; i < ueList.size(); i++)
 		{
@@ -193,6 +208,20 @@ public class PerformanceEvaluation
 		System.out.printf("SD of served latency = %.2f\n", sd);
 		return sd;
 		
+	}
+	public static double standardDeviationOfServedLatencyForInter(List<UE> ueList, List<Server> serverList)
+	{
+		List<Double> latency = new ArrayList<>();
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept()) // If UE i is accepted by some server.
+			{
+				latency.add( ueList.get(i).getLatency()[ueList.get(i).getProposeTo()] );
+			}
+		}
+		double sd = Function.calculateSD(latency);
+		System.out.printf("SD of served latency = %.2f\n", sd);
+		return sd;
 	}
 	public static double percentageOfOutsourcing(List<UE> ueList, List<Server> serverList)
 	{
@@ -243,6 +272,20 @@ public class PerformanceEvaluation
 		System.out.printf("SD of preference of accepted UEs = %.2f\n", result);
 		return result;
 	}
+	public static double averageRevenueOfTheServers(List<UE> ueList, List<Server> serverList)
+	{
+		double total = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				total += ueList.get(i).getBidArray()[ueList.get(i).getProposeTo()];
+			}
+		}
+		return total/serverList.size();
+	}
+	
+	
 	public static double[] preferenceCountDistribution(List<UE> ueList, List<Server> serverList)
 	{
 		double[] count = new double[serverList.size() + 1];
@@ -257,6 +300,22 @@ public class PerformanceEvaluation
 		}
 		return count;
 	}
+	public static double[] preferenceCountDistributionForInter(List<UE> ueList, List<Server> serverList)
+	{
+		double[] count = new double[serverList.size() + 1];
+		for(int i = 0; i < count.length; i++)	
+			count[i] = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+				count[0] += 0;
+//			else
+//				count[count.length-1] += 1;
+		}
+		return count;
+	}
+	
+	
 	public static double[] latencyCountDistribution(List<UE> ueList, List<Server> serverList)
 	{
 		double[] count = new double[20];
@@ -271,6 +330,21 @@ public class PerformanceEvaluation
 		}
 		return count;
 	}
+	public static double[] latencyCountDistributionForInter(List<UE> ueList, List<Server> serverList)
+	{
+		double[] count = new double[20];
+		for(int i = 0; i < count.length; i++) count[i] = 0;
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			if(ueList.get(i).getAccept())
+			{
+				double latency = ueList.get(i).getLatency()[ueList.get(i).getProposeTo()];
+				count[(int)(latency/10)] += 1;
+			}
+		}
+		return count;
+	}
+	
 	
 	
 	public static double[] performanceAverager(List<double[]> performance)
@@ -314,9 +388,9 @@ public class PerformanceEvaluation
 				break;
 		}
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "inter/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + ".csv";		
-		
+
 		Function.checkDirectoryWhetherExist(outputDirectory);
 //		File outputDir = new File(outputDirectory);
 //		if (!outputDir.exists())	outputDir.mkdir();	    
@@ -360,7 +434,7 @@ public class PerformanceEvaluation
 				break;
 		}
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "inter/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "BarChart"+ ".csv";		
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);
@@ -406,7 +480,7 @@ public class PerformanceEvaluation
 				break;
 		}
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "inter" + "/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "LatencyBarChart"+ ".csv";		
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);
@@ -433,7 +507,7 @@ public class PerformanceEvaluation
 	public static List<UE> ueListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
 	{
 		String algoString = Function.algoNumberToAlgoStream(algo);
-		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "UE" + ordinal + ".ue";
+		String inputUEFilePath = "output/" + "inter" + "/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "UE" + ordinal + ".ue";
 
 		FileInputStream fisUE = new FileInputStream(inputUEFilePath);
 		ObjectInputStream oisUE = new ObjectInputStream(fisUE);
@@ -446,7 +520,7 @@ public class PerformanceEvaluation
 	public static List<Server> serverListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
 	{
 		String algoString = Function.algoNumberToAlgoStream(algo);
-		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "server" + ordinal + ".server";
+		String inputUEFilePath = "output/" + "inter" + "/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "server" + ordinal + ".server";
 
 		FileInputStream fisServer = new FileInputStream(inputUEFilePath);
 		ObjectInputStream oisServer = new ObjectInputStream(fisServer);

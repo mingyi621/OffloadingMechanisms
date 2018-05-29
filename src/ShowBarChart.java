@@ -21,17 +21,21 @@ import org.jfree.data.category.*;
 public class ShowBarChart extends JFrame{
    public ShowBarChart() throws IOException
    {
-//      CategoryDataset dataset = createDataset();
-	  CategoryDataset dataset = readFile();
-      JFreeChart chart = createChart(dataset);
-      chart = customizeChart(chart);
-      ChartPanel chartPanel = new ChartPanel(chart);
-      chartPanel.setPreferredSize(new Dimension(500, 270));
-      getContentPane().add(chartPanel);
+//		CategoryDataset dataset = createDataset();
+	   
+//	   String whichChart = "BarChart";
+	   String whichChart = "LatencyBarChart";
+	   
+	   CategoryDataset dataset = readFile(whichChart);
+	   JFreeChart chart = createChart(dataset, whichChart);
+	   chart = customizeChart(chart);
+	   ChartPanel chartPanel = new ChartPanel(chart);
+	   chartPanel.setPreferredSize(new Dimension(800, 600));
+	   getContentPane().add(chartPanel);
 
-      pack();
-      setVisible(true);
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	   pack();
+	   setVisible(true);
+	   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
    }
 
    public static void main(String[] args) throws IOException
@@ -76,17 +80,41 @@ public class ShowBarChart extends JFrame{
       return dataset;
    }
 
-   private JFreeChart createChart(final CategoryDataset dataset){
-      JFreeChart chart = ChartFactory.createBarChart(
-         "Preference Distribution", // chart title
-         "Preference Count", // domain axis label
-         "Number of UE", // range axis label
-         dataset, // data
-         PlotOrientation.VERTICAL, // orientation
-         true, // include legend
-         true, // tooltips?
-         false // URLs?
-         );
+   private JFreeChart createChart(final CategoryDataset dataset, String whichChart){
+	   JFreeChart chart;
+	   if(whichChart.equals("BarChart"))   
+		   chart = ChartFactory.createBarChart(
+				   "Preference Distribution", // chart title
+				   "Preference Count", // domain axis label
+				   "Number of UE", // range axis label
+				   dataset, // data
+				   PlotOrientation.VERTICAL, // orientation
+				   true, // include legend
+				   true, // tooltips?
+				   false // URLs?
+				   );
+	   else if(whichChart.equals("LatencyBarChart"))
+		   chart = ChartFactory.createBarChart(
+				   "Latency Distribution", // chart title
+				   "Latency", // domain axis label
+				   "Number of UE", // range axis label
+				   dataset, // data
+				   PlotOrientation.VERTICAL, // orientation
+				   true, // include legend
+				   true, // tooltips?
+				   false // URLs?
+				   );
+	   else
+		   chart = ChartFactory.createBarChart(
+				   "Preference Distribution", // chart title
+				   "Preference Count", // domain axis label
+				   "Number of UE", // range axis label
+				   dataset, // data
+				   PlotOrientation.VERTICAL, // orientation
+				   true, // include legend
+				   true, // tooltips?
+				   false // URLs?
+				   );
       return chart;
    }
 
@@ -99,20 +127,21 @@ public class ShowBarChart extends JFrame{
       return chart;
    }
    
-   public CategoryDataset readFile() throws IOException
+   public CategoryDataset readFile(String whichChart) throws IOException
    {
 	   int UE = 500;
 	   int server = 10;
 	   
 //	   String whichChart = "BarChart";
-	   String whichChart = "LatencyBarChart";
+//	   String whichChart = "LatencyBarChart";
 	   
 	   DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 	   // row keys...
-	   String series0 = "DA";
-	   String series1 = "Random";
-	   String series2 = "Boston";
-	   String series3 = "WOIntra";
+	   String[] series = new String[4];
+	   series[0] = "INTRA";
+	   series[1] = "Random";
+	   series[2] = "Boston";
+	   series[3] = "WOIntra";
 
 	   // column keys...
 	   String[] category = new String[server+1];
@@ -120,23 +149,28 @@ public class ShowBarChart extends JFrame{
 	   {
 		   category[i] = String.valueOf(i);
 	   }
-	   
+	   // for intra
 	   for(int algo = 0; algo <= 3; algo++)
+		// for inter
+//		for(int algo = 0; algo <= 2; algo++)		   
 	   {
 		   	String algoString = Function.algoNumberToAlgoStream(algo);
    	
-   			String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+		   	//for intra
+   		String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+		   	//for inter
+//   			String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
    			FileReader fr = new FileReader(filePath);
    			BufferedReader br = new BufferedReader(fr);
    				
    			String[] field = br.readLine().split(",");
-   		
+   			
    			for(int i = 2; i < field.length; i++)
    			{
    				if(whichChart.equals("BarChart"))
-   					dataset.addValue(Double.parseDouble(field[i]), algoString, String.valueOf(i-2+1));
-   				if(whichChart.equalsIgnoreCase("LatencyBarChart"))
-   					dataset.addValue(Double.parseDouble(field[i]), algoString, String.valueOf((i-2)*10));
+   					dataset.addValue(Double.parseDouble(field[i]), series[algo], String.valueOf(i-2+1));
+   				if(whichChart.equals("LatencyBarChart"))
+   					dataset.addValue(Double.parseDouble(field[i]), series[algo], String.valueOf((i-2)*10));
    			}
    			br.close();		
 	   }

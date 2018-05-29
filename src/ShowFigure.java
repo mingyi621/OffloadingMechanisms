@@ -22,7 +22,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 3;  // input 2~10
+		int whichColumnIndex = 10;  // input 2~10, 11 for inter
 		ShowFigure demo = new ShowFigure(whichColumnIndex);
             
 		demo.pack();
@@ -57,13 +57,13 @@ public class ShowFigure extends ApplicationFrame
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(null);
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(800, 800));
+        chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
         setContentPane(chartPanel);
 
     }	
 	public static XYDataset readFile(int c) throws IOException
     {
-    	XYSeries series0 = new XYSeries("DA");
+    	XYSeries series0 = new XYSeries("INTRA");
     	XYSeries series1 = new XYSeries("Random");
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
@@ -74,7 +74,8 @@ public class ShowFigure extends ApplicationFrame
 		int serverInterval = 10;
 		int metricIndex = c; 			
 		
-    	for(int algo = 0; algo <= 3; algo++)
+    	for(int algo = 0; algo <= 3; algo++)  // For intra
+ //		for(int algo = 0; algo <= 2; algo++)  // For inter   		
     	{
     		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{
@@ -82,7 +83,11 @@ public class ShowFigure extends ApplicationFrame
     			{
     				String algoString = Function.algoNumberToAlgoStream(algo);
     	
+    				// For intra
     				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
+ 
+    				// For inter
+//    				String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
     				FileReader fr = new FileReader(filePath);
     				BufferedReader br = new BufferedReader(fr);
     				
@@ -164,6 +169,14 @@ public class ShowFigure extends ApplicationFrame
 				result[0] = "Standard Deviation of Preferences of Accepted UEs";
 				result[1] = "Numbers of UEs";
 				result[2] = "Standard Deviation";
+				break;
+				
+			// For inter
+			case 11:
+				result[0] = "Average Revenue of Each Server";
+				result[1] = "Numbers of UEs";
+				result[2] = "Revenue";
+				break;
 			default:
 				break;
 		}

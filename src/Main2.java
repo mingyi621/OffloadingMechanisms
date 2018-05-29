@@ -12,18 +12,18 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-//		bulkSetDataProcessor();
-		oneSetDataProcessor(100, 4, 1, 2); // UE, server, ordinal, algo
+		bulkSetDataProcessor();
+//		oneSetDataProcessor(100, 4, 1, 2); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 50, 100 };	// Both inclusion
+		int[] UERange = { 50, 200 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 2;
 		
-		for(int algo = 0; algo <= 3; algo++)
+		for(int algo = 0; algo <= 2; algo++)
 		{
 			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{	
