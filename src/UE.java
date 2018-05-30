@@ -32,7 +32,7 @@ public class UE implements Serializable
 		setDemand(d);
 		setMaximumLatency(max);
 		setValuation(value);
-		setEpsilon(10);
+		setEpsilon(50);
 	}
 	
 	

@@ -138,7 +138,13 @@ public class ShowBarChart extends JFrame{
 	   DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 	   // row keys...
 	   String[] series = new String[4];
-	   series[0] = "INTRA";
+	   
+	   // for intra
+//	   series[0] = "INTRA";
+	   
+	   // for inter
+	   series[0] = "INTER";
+	   
 	   series[1] = "Random";
 	   series[2] = "Boston";
 	   series[3] = "WOIntra";
@@ -150,16 +156,16 @@ public class ShowBarChart extends JFrame{
 		   category[i] = String.valueOf(i);
 	   }
 	   // for intra
-	   for(int algo = 0; algo <= 3; algo++)
+//	   for(int algo = 0; algo <= 3; algo++)
 		// for inter
-//		for(int algo = 0; algo <= 2; algo++)		   
+		for(int algo = 0; algo <= 2; algo++)		   
 	   {
 		   	String algoString = Function.algoNumberToAlgoStream(algo);
    	
 		   	//for intra
-   		String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+//		   	String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
 		   	//for inter
-//   			String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+   			String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
    			FileReader fr = new FileReader(filePath);
    			BufferedReader br = new BufferedReader(fr);
    				

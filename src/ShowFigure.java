@@ -22,7 +22,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 10;  // input 2~10, 11 for inter
+		int whichColumnIndex = 11;  // input 2~10, 11 for inter
 		ShowFigure demo = new ShowFigure(whichColumnIndex);
             
 		demo.pack();
@@ -63,7 +63,12 @@ public class ShowFigure extends ApplicationFrame
     }	
 	public static XYDataset readFile(int c) throws IOException
     {
-    	XYSeries series0 = new XYSeries("INTRA");
+		// for intra
+//    	XYSeries series0 = new XYSeries("INTRA");
+    	
+    	// for inter
+    	XYSeries series0 = new XYSeries("INTER");
+    	
     	XYSeries series1 = new XYSeries("Random");
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
@@ -74,8 +79,8 @@ public class ShowFigure extends ApplicationFrame
 		int serverInterval = 10;
 		int metricIndex = c; 			
 		
-    	for(int algo = 0; algo <= 3; algo++)  // For intra
- //		for(int algo = 0; algo <= 2; algo++)  // For inter   		
+ //   	for(int algo = 0; algo <= 3; algo++)  // For intra
+ 		for(int algo = 0; algo <= 2; algo++)  // For inter   		
     	{
     		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{
@@ -84,10 +89,10 @@ public class ShowFigure extends ApplicationFrame
     				String algoString = Function.algoNumberToAlgoStream(algo);
     	
     				// For intra
-    				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
+//    				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
  
     				// For inter
-//    				String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
+    				String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
     				FileReader fr = new FileReader(filePath);
     				BufferedReader br = new BufferedReader(fr);
     				
