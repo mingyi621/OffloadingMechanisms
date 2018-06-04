@@ -12,12 +12,12 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataProcessor();
-//		oneSetDataProcessor(100, 4, 1, 2); // UE, server, ordinal, algo
+//		bulkSetDataProcessor();
+		oneSetDataProcessor(10, 4, 2, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 50, 1000 };	// Both inclusion
+		int[] UERange = { 50, 500 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
@@ -279,13 +279,14 @@ public class Main2 {
 				{
 					int theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
 					ueList.get(i).setProposeTo(theBiggestIndex);
-					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					
 					ueList.get(i).setPreferenceCount(1);
 					ueList.get(i).showValuation(i);
 					ueList.get(i).showBidArray(i);
 					ueList.get(i).showLatency(i);
 					ueList.get(i).showUtilityArray(i);	
 					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
 				}
 				else if(ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() > -1 && ueList.get(i).getProposeTo() != -1)
 				{
@@ -296,13 +297,14 @@ public class Main2 {
 					ueList.get(i).refreshUtilityArray();
 					theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
 					ueList.get(i).setProposeTo(theBiggestIndex);
-					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					
 					ueList.get(i).setPreferenceCount(1);
 					ueList.get(i).showValuation(i);
 					ueList.get(i).showBidArray(i);
 					ueList.get(i).showLatency(i);
 					ueList.get(i).showUtilityArray(i);
 					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
 				}	
 			}
 			for(int i = 0; i < serverList.size(); i++)
@@ -559,7 +561,9 @@ public class Main2 {
 			globalContinueIndicator = false;
 			for(int i = 0; i < ueList.size(); i++)
 			{
-				if(ueList.get(i).getAccept())
+				if(ueList.get(i).getAccept())  // If the UE is accepted, then continue
+					continue;
+				if(ueList.get(i).getAllNegativeUtility()) // If all the servers for the UE have negative utilities, then it cannot be matched.
 					continue;
 			
 				boolean[] negativeUtilityIndicator = new boolean[serverList.size()];
@@ -580,10 +584,14 @@ public class Main2 {
 					break;
 				}while(negativeUtilityIndicator[server] == true);
 			
-				if(countNegative == serverList.size())
-					continue;
+				if(countNegative == serverList.size())  // all the servers for this UE have negative utility, set to unmatched.
+				{
+					ueList.get(i).setAllNegativeUtility(true);
+					continue; 	/* Still need to modify */
+				}
 			
-				if(triedIndicator[i][server] == true)
+				
+				if(triedIndicator[i][server] == true)  // The server has been tried by this UE, but at that time, it exceed the capacity.
 				{
 					double[] bidArray = ueList.get(i).getBidArray();
 					bidArray[server] += ueList.get(i).getEpsilon();
@@ -591,20 +599,36 @@ public class Main2 {
 					ueList.get(i).refreshUtilityArray();
 					if(ueList.get(i).getUtilityArray()[server] >= 0)
 						ueList.get(i).setProposeTo(server);
+					else
+					{
+						ueList.get(i).setProposeTo(-1);
+						continue;
+					}
 				}
 				else
 				{
 					ueList.get(i).setProposeTo(server);
 				}
-			
+				
+				triedIndicator[i][server] = true;
+				
+				ueList.get(i).showValuation(i);
+				ueList.get(i).showBidArray(i);
+				ueList.get(i).showLatency(i);
+				ueList.get(i).showUtilityArray(i);
+				System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+				System.out.printf("UE %d propose to server %d.\n", i, server);
+				
 				if(!serverList.get(server).checkWhetherExceedCapacity(ueList.get(i).getDemand()))
 				{
 					ueList.get(i).setAccept(true);
+					System.out.printf("UE %d got accepted from server %d\n", i, server);
 					serverList.get(server).setUsed(ueList.get(i).getDemand());
 				}
 				else
 				{
-//					globalContinueIndicator = true;
+					System.out.printf("Server %d exceeds the capacity for UE %d.\n", server, i);
+					globalContinueIndicator = true;
 				}
 			}
 		}while(globalContinueIndicator == true);
@@ -690,13 +714,14 @@ public class Main2 {
 				{
 					int theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
 					ueList.get(i).setProposeTo(theBiggestIndex);
-					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					
 					ueList.get(i).setPreferenceCount(1);
 					ueList.get(i).showValuation(i);
 					ueList.get(i).showBidArray(i);
 					ueList.get(i).showLatency(i);
 					ueList.get(i).showUtilityArray(i);	
 					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
 				}
 				else if(ueList.get(i).getAccept() == false && ueList.get(i).getPreferenceCount() > -1 && ueList.get(i).getProposeTo() != -1)
 				{
@@ -707,13 +732,14 @@ public class Main2 {
 					ueList.get(i).refreshUtilityArray();
 					theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
 					ueList.get(i).setProposeTo(theBiggestIndex);
-					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
+					
 					ueList.get(i).setPreferenceCount(1);
 					ueList.get(i).showValuation(i);
 					ueList.get(i).showBidArray(i);
 					ueList.get(i).showLatency(i);
 					ueList.get(i).showUtilityArray(i);
 					System.out.printf("UE %d's maximum latency: %.0f\n", i, ueList.get(i).getMaximumLatency());
+					System.out.printf("UE %d propose to server %d.\n", i, theBiggestIndex);
 				}
 				if(ueList.get(i).getProposeTo() != -1)
 				{
@@ -742,8 +768,7 @@ public class Main2 {
 						else
 						{
 							globalRejection = true;
-							System.out.printf("UE %d got rejected. Exceed the capacity.\n", proposer);
-							
+							System.out.printf("UE %d got rejected. Exceed the capacity.\n", proposer);	
 						}
 					}
 				}

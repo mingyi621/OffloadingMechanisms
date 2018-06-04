@@ -22,7 +22,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 11;  // input 2~10, 11 for inter
+		int whichColumnIndex = 6;  // input 2~10 for intra, 5,6,7,11 for inter
 		ShowFigure demo = new ShowFigure(whichColumnIndex);
             
 		demo.pack();
@@ -64,7 +64,7 @@ public class ShowFigure extends ApplicationFrame
 	public static XYDataset readFile(int c) throws IOException
     {
 		// for intra
-//    	XYSeries series0 = new XYSeries("INTRA");
+ //   	XYSeries series0 = new XYSeries("INTRA");
     	
     	// for inter
     	XYSeries series0 = new XYSeries("INTER");
@@ -89,7 +89,7 @@ public class ShowFigure extends ApplicationFrame
     				String algoString = Function.algoNumberToAlgoStream(algo);
     	
     				// For intra
-//    				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
+ //   				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
  
     				// For inter
     				String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";

@@ -11,8 +11,8 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataGenerator();
-//		oneSetDataGenerator(100, 4, 1); // UE, Server, Ordinal
+//		bulkSetDataGenerator();
+		oneSetDataGenerator(100, 4, 2); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{

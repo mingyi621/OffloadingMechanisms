@@ -20,6 +20,9 @@ public class UE implements Serializable
 	double[] utilityArray;
 	double epsilon;
 	
+	// For Random in inter-offloading
+	boolean allNegativeUtility = false;
+	
 	// Constructor for intra-offloading
 	public UE(double[] d, double max)
 	{
@@ -234,7 +237,8 @@ public class UE implements Serializable
 			}
 			else
 			{
-				utilityArray[i] = getValuation() - w * getLatency()[i] - getBidArray()[i];
+			//	utilityArray[i] = getValuation() - w * getLatency()[i] - getBidArray()[i];
+				utilityArray[i] = (getValuation() - getBidArray()[i]) / getLatency()[i];
 			}
 		}
 	}
@@ -272,5 +276,15 @@ public class UE implements Serializable
 	public double getEpsilon()
 	{
 		return epsilon;
+	}
+	
+	// for RandomWithTransfer in inter
+	public void setAllNegativeUtility(boolean input)
+	{
+		allNegativeUtility = input;
+	}
+	public boolean getAllNegativeUtility()
+	{
+		return allNegativeUtility;
 	}
 }
