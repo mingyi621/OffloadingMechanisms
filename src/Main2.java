@@ -12,8 +12,8 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataProcessor();
-//		oneSetDataProcessor(50, 4, 2, 0); // UE, server, ordinal, algo
+//		bulkSetDataProcessor();
+		oneSetDataProcessor(500, 9, 2, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
@@ -834,10 +834,12 @@ public class Main2 {
 		BufferedWriter bw = new BufferedWriter(w);
 		
 		String line;
+		int count = 0;
 		for(int i = 0; i < ueList.size(); i++)
 		{
 			if(ueList.get(i).getAccept())
 			{
+				count++;
 				line = Integer.toString(i) + "," + Integer.toString(ueList.get(i).getProposeTo());
 				System.out.printf("UE %d matches to server %d\n", i, ueList.get(i).getProposeTo());
 			}
@@ -850,6 +852,7 @@ public class Main2 {
 			bw.write(line);
 			bw.newLine();
 		}
+		System.out.printf("Total %d accepts.\n", count);
 		bw.close();
 		
 	}

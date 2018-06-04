@@ -11,8 +11,8 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataGenerator();
-//		oneSetDataGenerator(100, 4, 2); // UE, Server, Ordinal
+//		bulkSetDataGenerator();
+		oneSetDataGenerator(500, 9, 2); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException
 	{
@@ -152,9 +152,9 @@ public class DataGenerator
 				unitValuation[2] = 0.06 + 0.01 * random.nextGaussian();
 			}while(unitValuation[0] <= 0 || unitValuation[1] <= 0 || unitValuation[2] <= 0);
 			
-			double[] valuation = {requestArray[0] * unitValuation[0]
-							 	+ requestArray[1] * unitValuation[1]
-							 	+ requestArray[2] * unitValuation[2]};
+			double[] valuation = {requestArray[0] * (unitValuation[0] + 20/requestArray[0])
+							 	+ requestArray[1] * (unitValuation[1] + 2/requestArray[1])
+							 	+ requestArray[2] * (unitValuation[2] + 0.02/requestArray[2]) };
 			list.add(valuation);
 		}
 		return list;

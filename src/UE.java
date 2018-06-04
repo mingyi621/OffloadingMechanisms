@@ -35,7 +35,8 @@ public class UE implements Serializable
 		setDemand(d);
 		setMaximumLatency(max);
 		setValuation(value);
-		setEpsilon(5);
+//		setEpsilon(10);
+		setEpsilon(10, getDemand());
 	}
 	
 	
@@ -272,6 +273,10 @@ public class UE implements Serializable
 	public void setEpsilon(int e)
 	{
 		epsilon = e;
+	}
+	public void setEpsilon(int e, double[] demand)
+	{
+		epsilon = e * demand[0];
 	}
 	public double getEpsilon()
 	{
