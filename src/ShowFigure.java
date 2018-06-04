@@ -22,7 +22,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 6;  // input 2~10 for intra, 5,6,7,11 for inter
+		int whichColumnIndex = 11;  // input 2~10 for intra, 5,6,7,11 for inter
 		ShowFigure demo = new ShowFigure(whichColumnIndex);
             
 		demo.pack();
@@ -73,7 +73,7 @@ public class ShowFigure extends ApplicationFrame
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
     	
-    	int[] UERange = { 50, 1000 };	// Both inclusion
+    	int[] UERange = { 50, 500 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;

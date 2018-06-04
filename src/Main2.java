@@ -12,8 +12,8 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-//		bulkSetDataProcessor();
-		oneSetDataProcessor(10, 4, 2, 0); // UE, server, ordinal, algo
+		bulkSetDataProcessor();
+//		oneSetDataProcessor(50, 4, 2, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
