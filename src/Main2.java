@@ -12,16 +12,16 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-//		bulkSetDataProcessor();
-		oneSetDataProcessor(500, 9, 2, 0); // UE, server, ordinal, algo
+		bulkSetDataProcessor();
+//		oneSetDataProcessor(500, 9, 2, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
-		int[] UERange = { 50, 500 };	// Both inclusion
+		int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 1;
 		
 		for(int algo = 0; algo <= 2; algo++)
 		{

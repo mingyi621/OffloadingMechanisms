@@ -1,10 +1,16 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -29,20 +35,38 @@ public class ShowFigure extends ApplicationFrame
 		RefineryUtilities.centerFrameOnScreen(demo);
 		demo.setVisible(true);
 	}
+	public void outputEPS(JFreeChart chart)
+	{
+		try{
+//				JFreeChart chart = getXYChart();
+				Properties p = new Properties();
+				VectorGraphics g = new PSGraphics2D(new File("Output.eps"), new Dimension(400,300)); 
+				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 400, 300);
+				g.startExport(); 
+				chart.draw(g, r2d);
+				g.endExport();
+		} catch (Exception iox) {
+				iox.printStackTrace();
+		}
+	}
+	public JFreeChart createChart(XYDataset dataset, int column)
+	{
+		return ChartFactory.createXYLineChart(
+	        	columnIndextoString(column)[0],	// Title
+	        	columnIndextoString(column)[1],  // X
+	        	columnIndextoString(column)[2], 	// Y
+	            dataset,
+	            PlotOrientation.VERTICAL,
+	            true,
+	            false,
+	            false
+	        );
+	}
 	public ShowFigure(int c) throws IOException
 	{
         super(columnIndextoString(c)[0]);
         XYDataset dataset = readFile(c);
-        JFreeChart chart = ChartFactory.createXYLineChart(
-        	columnIndextoString(c)[0],	// Title
-        	columnIndextoString(c)[1],  // X
-        	columnIndextoString(c)[2], 	// Y
-            dataset,
-            PlotOrientation.VERTICAL,
-            true,
-            false,
-            false
-        );
+        JFreeChart chart = createChart(dataset, c);
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
@@ -59,6 +83,8 @@ public class ShowFigure extends ApplicationFrame
         final ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
         setContentPane(chartPanel);
+        
+        outputEPS(chart);
 
     }	
 	public static XYDataset readFile(int c) throws IOException

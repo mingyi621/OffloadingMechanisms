@@ -16,11 +16,11 @@ public class PerformanceEvaluation2
 	}
 	public static void bulkSetDataProcessor() throws ClassNotFoundException, IOException
 	{
-		int[] UERange = { 50, 500 };	// Both inclusion
+		int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 10;
+		int numberOfSetForEachUE = 1;
 		
 		for(int algo = 0; algo <= 2; algo++)
 		{
