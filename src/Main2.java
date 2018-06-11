@@ -292,7 +292,10 @@ public class Main2 {
 				{
 					int theBiggestIndex = ueList.get(i).getProposeTo();
 					double[] bidArray = ueList.get(i).getBidArray();
-					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon();
+					
+//					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon(); 					// original implement by me.
+					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon(theBiggestIndex);		// Yen's advice.
+					
 					ueList.get(i).setBidArray(bidArray);
 					ueList.get(i).refreshUtilityArray();
 					theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();
@@ -459,7 +462,7 @@ public class Main2 {
 			System.out.println();
 		}
 	}
-	public static void RandomAlgorithmWithTransfer(List<UE> ueList, List<Server> serverList)
+	public static void RandomAlgorithmWithTransfer(List<UE> ueList, List<Server> serverList)  // Bad Algorithm
 	{
 		Random ra = new Random();
 		int server = -1;
@@ -594,7 +597,9 @@ public class Main2 {
 				if(triedIndicator[i][server] == true)  // The server has been tried by this UE, but at that time, it exceed the capacity.
 				{
 					double[] bidArray = ueList.get(i).getBidArray();
-					bidArray[server] += ueList.get(i).getEpsilon();
+//					bidArray[server] += ueList.get(i).getEpsilon();				// original implement by me.
+					bidArray[server] += ueList.get(i).getEpsilon(server);		// Yen's advice.
+					
 					ueList.get(i).setBidArray(bidArray);
 					ueList.get(i).refreshUtilityArray();
 					if(ueList.get(i).getUtilityArray()[server] >= 0)
@@ -727,7 +732,10 @@ public class Main2 {
 				{
 					int theBiggestIndex = ueList.get(i).getProposeTo();
 					double[] bidArray = ueList.get(i).getBidArray();
-					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon();
+					
+//					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon();				// original implement by me.
+					bidArray[theBiggestIndex] += ueList.get(i).getEpsilon(theBiggestIndex);	// Yen's advice.
+					
 					ueList.get(i).setBidArray(bidArray);
 					ueList.get(i).refreshUtilityArray();
 					theBiggestIndex = ueList.get(i).checkTheBiggestIndexInUtilityArray();

@@ -282,6 +282,12 @@ public class UE implements Serializable
 	{
 		return epsilon;
 	}
+	public double getEpsilon(int index)
+	{
+		int division = 4;
+		
+		return ( getValuation() - getAskArray()[index] ) / division;
+	}
 	
 	// for RandomWithTransfer in inter
 	public void setAllNegativeUtility(boolean input)
