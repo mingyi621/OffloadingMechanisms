@@ -29,21 +29,28 @@ public class ShowFigure extends ApplicationFrame
 	public static void main(String[] args) throws IOException
 	{
 		int whichColumnIndex = 11;  // input 2~10 for intra, 5,6,7,11 for inter
-		ShowFigure demo = new ShowFigure(whichColumnIndex);
+		int intraOrInter = 0; // intra = 0, inter = 1
+		
+		ShowFigure demo = new ShowFigure(whichColumnIndex, intraOrInter);
             
 		demo.pack();
 		RefineryUtilities.centerFrameOnScreen(demo);
 		demo.setVisible(true);
 	}
-	public void outputEPS(JFreeChart chart)
+	public void outputEPS(JFreeChart chart, int c, int intraOrInter)
 	{
+		String st = "";
+		if(intraOrInter == 0)  		st = "intra";
+		else if(intraOrInter == 1) 	st = "inter";
+		
 		try{
-//				JFreeChart chart = getXYChart();
 				Properties p = new Properties();
-				VectorGraphics g = new PSGraphics2D(new File("Output.eps"), new Dimension(400,300)); 
-				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 400, 300);
+				VectorGraphics g = new PSGraphics2D(new File( st + c + ".eps"), new Dimension(500, 475)); 
+				g.setBackground(null);
+				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 500, 475);
 				g.startExport(); 
 				chart.draw(g, r2d);
+				chart.setBackgroundPaint(null);
 				g.endExport();
 		} catch (Exception iox) {
 				iox.printStackTrace();
@@ -52,8 +59,9 @@ public class ShowFigure extends ApplicationFrame
 	public JFreeChart createChart(XYDataset dataset, int column)
 	{
 		return ChartFactory.createXYLineChart(
-	        	columnIndextoString(column)[0],	// Title
-	        	columnIndextoString(column)[1],  // X
+				"",
+//	        	columnIndextoString(column)[0],		// Title
+	        	columnIndextoString(column)[1],  	// X
 	        	columnIndextoString(column)[2], 	// Y
 	            dataset,
 	            PlotOrientation.VERTICAL,
@@ -62,11 +70,12 @@ public class ShowFigure extends ApplicationFrame
 	            false
 	        );
 	}
-	public ShowFigure(int c) throws IOException
+	public ShowFigure(int c, int intraOrInter) throws IOException
 	{
         super(columnIndextoString(c)[0]);
-        XYDataset dataset = readFile(c);
+        XYDataset dataset = readFile(c, intraOrInter);
         JFreeChart chart = createChart(dataset, c);
+        chart.setBackgroundPaint(null);
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
@@ -82,19 +91,22 @@ public class ShowFigure extends ApplicationFrame
         plot.setBackgroundPaint(null);
         final ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
+        chartPanel.setBackground(null);
         setContentPane(chartPanel);
         
-        outputEPS(chart);
+        outputEPS(chart, c, intraOrInter);
 
     }	
-	public static XYDataset readFile(int c) throws IOException
+	public static XYDataset readFile(int c, int intraOrInter) throws IOException
     {
-		// for intra
- //   	XYSeries series0 = new XYSeries("INTRA");
-    	
-    	// for inter
-    	XYSeries series0 = new XYSeries("INTER");
-    	
+		XYSeries series0 = null;
+		
+		if(intraOrInter == 0)
+			series0 = new XYSeries("INTRA");  // for intra
+		else if(intraOrInter == 1)
+			series0 = new XYSeries("INTER");  // for inter
+		else;
+		
     	XYSeries series1 = new XYSeries("Random");
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
@@ -103,22 +115,33 @@ public class ShowFigure extends ApplicationFrame
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int metricIndex = c; 			
+		int metricIndex = c; 		
 		
- //   	for(int algo = 0; algo <= 3; algo++)  // For intra
- 		for(int algo = 0; algo <= 2; algo++)  // For inter   		
+		int intraAlgoNumber = 3;
+		int interAlgoNumber = 2;
+		int algoNumber = 0;
+		
+		if(intraOrInter == 0)
+			algoNumber = intraAlgoNumber;
+		else if(intraOrInter == 1)
+			algoNumber = interAlgoNumber;
+		else;
+			
+ 		for(int algo = 0; algo <= algoNumber; algo++)  		
     	{
     		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{
     			for(int UE = UERange[0]; UE <= UERange[1]; UE = UE + UEInterval)
     			{
     				String algoString = Function.algoNumberToAlgoStream(algo);
-    	
-    				// For intra
- //   				String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
- 
-    				// For inter
-    				String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
+    				
+    				String filePath = "";
+    				if(intraOrInter == 0)
+    					filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
+    				else if(intraOrInter == 1)
+    					filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
+    				else;
+    				
     				FileReader fr = new FileReader(filePath);
     				BufferedReader br = new BufferedReader(fr);
     				
