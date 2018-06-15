@@ -12,8 +12,8 @@ public class Main2 {
 
 	public static void main(String[] args) throws IOException
 	{
-		bulkSetDataProcessor();
-//		oneSetDataProcessor(500, 9, 2, 0); // UE, server, ordinal, algo
+//		bulkSetDataProcessor();
+		oneSetDataProcessor(6, 3, 100, 0); // UE, server, ordinal, algo
 	}
 	public static void bulkSetDataProcessor() throws IOException
 	{
@@ -850,6 +850,7 @@ public class Main2 {
 				count++;
 				line = Integer.toString(i) + "," + Integer.toString(ueList.get(i).getProposeTo());
 				System.out.printf("UE %d matches to server %d\n", i, ueList.get(i).getProposeTo());
+				System.out.printf("UE %d's bid = %.2f\n", i, ueList.get(i).getBidArray()[ueList.get(i).getProposeTo()]);
 			}
 			else
 			{

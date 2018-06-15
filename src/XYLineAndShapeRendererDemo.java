@@ -1,12 +1,18 @@
 // This code is from http://www.java2s.com/Code/Java/Chart/JFreeChartXYLineAndShapeRendererDemo.htm
 // This code is to create a figure for line and shape.
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -34,7 +40,8 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
         super(title);
         XYDataset dataset = createSampleDataset(UECoordinate, serverCoordinate);
         JFreeChart chart = ChartFactory.createXYLineChart(
-            title,
+            //title,
+        		"",
             "X",
             "Y",
             dataset,
@@ -55,7 +62,25 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
         chartPanel.setPreferredSize(new java.awt.Dimension(800, 800));
         setContentPane(chartPanel);
 
+        outputEPS(chart);
     }
+    public void outputEPS(JFreeChart chart)
+	{
+
+		
+		try{
+				Properties p = new Properties();
+				VectorGraphics g = new PSGraphics2D(new File("area.eps"), new Dimension(500, 375)); 
+				g.setBackground(null);
+				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 500, 375);
+				g.startExport(); 
+				chart.draw(g, r2d);
+				chart.setBackgroundPaint(null);
+				g.endExport();
+		} catch (Exception iox) {
+				iox.printStackTrace();
+		}
+	}
     
     /**
      * Creates a sample dataset.
@@ -63,12 +88,12 @@ public class XYLineAndShapeRendererDemo extends ApplicationFrame {
      * @return A dataset.
      */
     private XYDataset createSampleDataset(List<Point2D> UECoordinate, List<Point2D> serverCoordinate) {
-    	XYSeries series1 = new XYSeries("ServerCoordinate");
+    	XYSeries series1 = new XYSeries("Server");
         for(int i = 0; i < serverCoordinate.size(); i++)
         {
         	series1.add(serverCoordinate.get(i).getX(), serverCoordinate.get(i).getY());
         }
-    	XYSeries series2 = new XYSeries("UE Coordinate");
+    	XYSeries series2 = new XYSeries("UE");
         for(int i = 0; i < UECoordinate.size(); i++)
         {
         	series2.add(UECoordinate.get(i).getX(), UECoordinate.get(i).getY());
