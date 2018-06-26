@@ -851,11 +851,15 @@ public class Main2 {
 				line = Integer.toString(i) + "," + Integer.toString(ueList.get(i).getProposeTo());
 				System.out.printf("UE %d matches to server %d\n", i, ueList.get(i).getProposeTo());
 				System.out.printf("UE %d's bid = %.2f\n", i, ueList.get(i).getBidArray()[ueList.get(i).getProposeTo()]);
+				ueList.get(i).showBidArray(i);
+				ueList.get(i).showUtilityArray(i);
 			}
 			else
 			{
 				line = Integer.toString(i) + "," + "-1";
 				System.out.printf("UE %d matches failed.\n", i);
+				ueList.get(i).showBidArray(i);
+				ueList.get(i).showUtilityArray(i);
 			}
 			System.out.println(line);
 			bw.write(line);

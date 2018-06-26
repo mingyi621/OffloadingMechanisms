@@ -2,12 +2,17 @@
 // This code is for create Bar Chart.
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.*;
 
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -36,6 +41,8 @@ public class ShowBarChart extends JFrame{
 	   pack();
 	   setVisible(true);
 	   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	   
+	   outputEPS(chart);
    }
 
    public static void main(String[] args) throws IOException
@@ -95,9 +102,9 @@ public class ShowBarChart extends JFrame{
 				   );
 	   else if(whichChart.equals("LatencyBarChart"))
 		   chart = ChartFactory.createBarChart(
-				   "Latency Distribution", // chart title
+				 "",  //"Latency Distribution", // chart title
 				   "Latency", // domain axis label
-				   "Number of UE", // range axis label
+				   "Percentage of UEs", // range axis label
 				   dataset, // data
 				   PlotOrientation.VERTICAL, // orientation
 				   true, // include legend
@@ -140,10 +147,10 @@ public class ShowBarChart extends JFrame{
 	   String[] series = new String[4];
 	   
 	   // for intra
-//	   series[0] = "INTRA";
+	   series[0] = "INTRA";
 	   
 	   // for inter
-	   series[0] = "INTER";
+//	   series[0] = "INTER";
 	   
 	   series[1] = "Random";
 	   series[2] = "Boston";
@@ -156,30 +163,46 @@ public class ShowBarChart extends JFrame{
 		   category[i] = String.valueOf(i);
 	   }
 	   // for intra
-//	   for(int algo = 0; algo <= 3; algo++)
+	   for(int algo = 0; algo <= 3; algo++)
 		// for inter
-		for(int algo = 0; algo <= 2; algo++)		   
+//		for(int algo = 0; algo <= 2; algo++)		   
 	   {
 		   	String algoString = Function.algoNumberToAlgoStream(algo);
    	
 		   	//for intra
-//		   	String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+		   	String filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
 		   	//for inter
-   			String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
+//   			String filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "-" + whichChart + ".csv"; 
    			FileReader fr = new FileReader(filePath);
    			BufferedReader br = new BufferedReader(fr);
    				
    			String[] field = br.readLine().split(",");
    			
-   			for(int i = 2; i < field.length; i++)
+   			for(int i = 2; i < field.length-8; i++)
    			{
    				if(whichChart.equals("BarChart"))
    					dataset.addValue(Double.parseDouble(field[i]), series[algo], String.valueOf(i-2+1));
    				if(whichChart.equals("LatencyBarChart"))
-   					dataset.addValue(Double.parseDouble(field[i]), series[algo], String.valueOf((i-2)*10));
+   					dataset.addValue(Double.parseDouble(field[i])/500, series[algo], String.valueOf((i-2)*10));
    			}
    			br.close();		
 	   }
+	   
 	   return dataset;
    }
+   public void outputEPS(JFreeChart chart)
+	{
+		try{
+				Properties p = new Properties();
+				VectorGraphics g = new PSGraphics2D(new File("LatencyBarChart.eps"), new Dimension(500, 375)); 
+				g.setBackground(null);
+				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 500, 375);
+				g.startExport(); 
+				chart.draw(g, r2d);
+				chart.setBackgroundPaint(null);
+				g.endExport();
+		} catch (Exception iox) {
+				iox.printStackTrace();
+		}
+	}
 }
