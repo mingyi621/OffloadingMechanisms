@@ -28,7 +28,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 11;  // input 2~10 for intra, 5,6,7,11 for inter
+		int whichColumnIndex = 5;  // input 2~10 for intra, 5,6,7,11 for inter
 		int intraOrInter = 0; // intra = 0, inter = 1
 		
 		ShowFigure demo = new ShowFigure(whichColumnIndex, intraOrInter);
@@ -87,6 +87,10 @@ public class ShowFigure extends ApplicationFrame
         renderer.setSeriesShapesVisible(2, true); 
         renderer.setSeriesLinesVisible(3, true);
         renderer.setSeriesShapesVisible(3, true); 
+        renderer.setSeriesLinesVisible(4, true);
+        renderer.setSeriesShapesVisible(4, true); 
+        renderer.setSeriesLinesVisible(5, true);
+        renderer.setSeriesShapesVisible(5, true); 
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(null);
         final ChartPanel chartPanel = new ChartPanel(chart);
@@ -100,9 +104,16 @@ public class ShowFigure extends ApplicationFrame
 	public static XYDataset readFile(int c, int intraOrInter) throws IOException
     {
 		XYSeries series0 = null;
+		XYSeries series4 = null;
+		XYSeries series5 = null;
 		
 		if(intraOrInter == 0)
+		{
 			series0 = new XYSeries("INTRA");  // for intra
+			series4 = new XYSeries("INTRA-Latency");
+			series5 = new XYSeries("Boston-Latency");
+			
+		}
 		else if(intraOrInter == 1)
 			series0 = new XYSeries("INTER");  // for inter
 		else;
@@ -111,13 +122,13 @@ public class ShowFigure extends ApplicationFrame
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
     	
-    	int[] UERange = { 50, 500 };	// Both inclusion
+    	int[] UERange = { 50, 1000 };	// Both inclusion
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
 		int metricIndex = c; 		
 		
-		int intraAlgoNumber = 3;
+		int intraAlgoNumber = 5;
 		int interAlgoNumber = 2;
 		int algoNumber = 0;
 		
@@ -160,6 +171,12 @@ public class ShowFigure extends ApplicationFrame
     					case 3:
     						series3.add(Double.parseDouble(field[0]),Double.parseDouble(field[metricIndex]));
     						break;
+    					case 4:
+    						series4.add(Double.parseDouble(field[0]),Double.parseDouble(field[metricIndex]));
+    						break;
+    					case 5:
+    						series5.add(Double.parseDouble(field[0]),Double.parseDouble(field[metricIndex]));
+    						break;
     					default:
     						break;
     				}
@@ -172,6 +189,8 @@ public class ShowFigure extends ApplicationFrame
         dataset.addSeries(series1);
         dataset.addSeries(series2);
         dataset.addSeries(series3);
+        dataset.addSeries(series4);
+        dataset.addSeries(series5);
         return dataset;
     }
 	public static String[] columnIndextoString(int c)
