@@ -206,6 +206,12 @@ public class Function
 			case 3:
 				algoString = "WOIntra";
 				break;
+			case 4:
+				algoString = "DA-Latency";
+				break;
+			case 5:
+				algoString = "Boston-Latency";
+				break;
 			default:
 				algoString = "--";
 				break;

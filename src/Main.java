@@ -76,22 +76,41 @@ public class Main {
 			ueList.get(i).setLatency(latency);
 		}
 		
-		// 2. Set UEs' Preference List
-		for(int i = 0; i < ueList.size(); i++)
+		if(algo <= 3)
 		{
-			ueList.get(i).setPreference();
-			System.out.printf("Preference list of UE %d: ",i);
-			ueList.get(i).showPreference();
-		}
+			// 2. Set UEs' Preference List
+			for(int i = 0; i < ueList.size(); i++)
+			{
+				ueList.get(i).setPreference();
+				System.out.printf("Preference list of UE %d: ",i);
+				ueList.get(i).showPreference();
+			}
 		
 		
-		// 3. Set Servers' Preference List
-		for(int i = 0; i < serverList.size(); i++)
-		{
-			serverList.get(i).setPreference(ueList);
-			System.out.printf("Preference list of server %d: ",i);
-			serverList.get(i).showPreference();
+			// 3. Set Servers' Preference List
+			for(int i = 0; i < serverList.size(); i++)
+			{
+				serverList.get(i).setPreference(ueList);
+				System.out.printf("Preference list of server %d: ",i);
+				serverList.get(i).showPreference();
+			}
 		}
+		else if(algo > 3)
+		{
+			for(int i = 0; i < serverList.size(); i++)
+			{
+				serverList.get(i).setPreferenceByLatency(ueList, i);
+				System.out.printf("Preference list of server %d: ",i);
+				serverList.get(i).showPreference();
+			}
+			for(int i = 0; i < ueList.size(); i++)
+			{
+				ueList.get(i).setPreference();
+				System.out.printf("Preference list of UE %d: ",i);
+				ueList.get(i).showPreference();
+			}
+		}
+		else;
 		
 		switch(algo)
 		{
@@ -109,6 +128,14 @@ public class Main {
 		
 			case 3:	
 				WithoutOutsourcing(ueList, serverList);
+				break;
+				
+			case 4:
+				deferredAcceptanceAlgorithm(ueList, serverList);
+				break;
+			
+			case 5:
+				BostonMechanism(ueList, serverList);
 				break;
 				
 			default:

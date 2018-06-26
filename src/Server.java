@@ -91,6 +91,26 @@ public class Server implements Serializable
 		}
 		
 	}
+	public void setPreferenceByLatency(List<UE> ueList, int server)
+	{
+		double[] latency = new double[ueList.size()];
+		preference = new int[ueList.size()];
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			latency[i] = ueList.get(i).getLatency()[server];
+		}
+		double[] index = new double[ueList.size()];
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			index[i] = i;
+		}
+		Function.mergeSort(latency, index);
+		for(int i = 0; i < ueList.size(); i++)
+		{
+			preference[i] = (int)index[i];
+		}
+	}
+	
 	public int[] getPreference()
 	{
 		return preference;
