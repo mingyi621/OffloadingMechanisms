@@ -28,7 +28,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 5;  // input 2~10 for intra, 5,6,7,11 for inter
+		int whichColumnIndex = 10;  // input 2~10 for intra, 5,6,7,11 for inter
 		int intraOrInter = 0; // intra = 0, inter = 1
 		
 		ShowFigure demo = new ShowFigure(whichColumnIndex, intraOrInter);
@@ -45,9 +45,9 @@ public class ShowFigure extends ApplicationFrame
 		
 		try{
 				Properties p = new Properties();
-				VectorGraphics g = new PSGraphics2D(new File( st + c + ".eps"), new Dimension(500, 475)); 
+				VectorGraphics g = new PSGraphics2D(new File( st + c + ".eps"), new Dimension(500, 375)); 
 				g.setBackground(null);
-				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 500, 475);
+				Rectangle2D r2d = new Rectangle2D.Double(0, 0, 500, 375);
 				g.startExport(); 
 				chart.draw(g, r2d);
 				chart.setBackgroundPaint(null);
@@ -78,7 +78,9 @@ public class ShowFigure extends ApplicationFrame
         chart.setBackgroundPaint(null);
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
+        renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB));
+ 	   	renderer.setSeriesPaint(4, new Color(0xFF, 0x8C, 0x00)); 
+ 	   	renderer.setSeriesPaint(5, new Color(0x00, 0x8C, 0xFF)); 
         renderer.setSeriesLinesVisible(0, true);
         renderer.setSeriesShapesVisible(0, true);
         renderer.setSeriesLinesVisible(1, true);
@@ -111,13 +113,13 @@ public class ShowFigure extends ApplicationFrame
 		{
 			series0 = new XYSeries("INTRA");  // for intra
 			series4 = new XYSeries("INTRA-Latency");
-			series5 = new XYSeries("Boston-Latency");
+//			series5 = new XYSeries("Boston-Latency");
+			series5 = new XYSeries("CHA");
 			
 		}
 		else if(intraOrInter == 1)
 			series0 = new XYSeries("INTER");  // for inter
 		else;
-		
     	XYSeries series1 = new XYSeries("Random");
     	XYSeries series2 = new XYSeries("Boston");
     	XYSeries series3 = new XYSeries("WOIntra");
@@ -189,7 +191,7 @@ public class ShowFigure extends ApplicationFrame
         dataset.addSeries(series1);
         dataset.addSeries(series2);
         dataset.addSeries(series3);
-        dataset.addSeries(series4);
+//        dataset.addSeries(series4);
         dataset.addSeries(series5);
         return dataset;
     }

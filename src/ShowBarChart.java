@@ -93,7 +93,7 @@ public class ShowBarChart extends JFrame{
 		   chart = ChartFactory.createBarChart(
 				   "Preference Distribution", // chart title
 				   "Preference Count", // domain axis label
-				   "Number of UE", // range axis label
+				   "Percentage of UE", // range axis label
 				   dataset, // data
 				   PlotOrientation.VERTICAL, // orientation
 				   true, // include legend
@@ -115,7 +115,7 @@ public class ShowBarChart extends JFrame{
 		   chart = ChartFactory.createBarChart(
 				   "Preference Distribution", // chart title
 				   "Preference Count", // domain axis label
-				   "Number of UE", // range axis label
+				   "Percentage of UE", // range axis label
 				   dataset, // data
 				   PlotOrientation.VERTICAL, // orientation
 				   true, // include legend
@@ -130,7 +130,9 @@ public class ShowBarChart extends JFrame{
 	   BarRenderer renderer = (BarRenderer) plot.getRenderer();
 	   renderer.setBarPainter(new StandardBarPainter());
 	   plot.setBackgroundPaint(null);
-	   renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
+//	   renderer.setSeriesPaint(3, new Color(0xBB, 0xBB, 0xBB)); 
+	   	renderer.setSeriesPaint(3, new Color(0xFF, 0x8C, 0x00)); 
+	   	renderer.setSeriesPaint(5, new Color(0x00, 0x8C, 0xFF)); 
       return chart;
    }
    
@@ -144,7 +146,7 @@ public class ShowBarChart extends JFrame{
 	   
 	   DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 	   // row keys...
-	   String[] series = new String[4];
+	   String[] series = new String[6];
 	   
 	   // for intra
 	   series[0] = "INTRA";
@@ -154,7 +156,13 @@ public class ShowBarChart extends JFrame{
 	   
 	   series[1] = "Random";
 	   series[2] = "Boston";
-	   series[3] = "WOIntra";
+//	   series[3] = "WOIntra";
+//	   series[4] = "INTRA-Latency";
+//	   series[5] = "Boston-Latency";
+	   
+	   series[3] = "";
+	   series[4] = "";
+	   series[5] = "CHA";
 
 	   // column keys...
 	   String[] category = new String[server+1];
@@ -163,10 +171,13 @@ public class ShowBarChart extends JFrame{
 		   category[i] = String.valueOf(i);
 	   }
 	   // for intra
-	   for(int algo = 0; algo <= 3; algo++)
+	   for(int algo = 0; algo <= 5; algo++)
 		// for inter
 //		for(int algo = 0; algo <= 2; algo++)		   
 	   {
+		   if(algo == 4 || algo == 3)
+			   continue;
+		   
 		   	String algoString = Function.algoNumberToAlgoStream(algo);
    	
 		   	//for intra
@@ -181,7 +192,7 @@ public class ShowBarChart extends JFrame{
    			for(int i = 2; i < field.length-8; i++)
    			{
    				if(whichChart.equals("BarChart"))
-   					dataset.addValue(Double.parseDouble(field[i]), series[algo], String.valueOf(i-2+1));
+   					dataset.addValue(Double.parseDouble(field[i])/500, series[algo], String.valueOf(i-2+1));
    				if(whichChart.equals("LatencyBarChart"))
    					dataset.addValue(Double.parseDouble(field[i])/500, series[algo], String.valueOf((i-2)*10));
    			}

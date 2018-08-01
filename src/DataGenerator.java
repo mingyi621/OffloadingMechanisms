@@ -11,7 +11,10 @@ public class DataGenerator
 {
 	public static void main(String[] args) throws IOException
 	{
+		// To generate bulk of data
 		bulkSetDataGenerator();
+		
+		// To generate only one set of data
 //		oneSetDataGenerator(500, 9, 2); // UE, Server, Ordinal
 	}
 	public static void bulkSetDataGenerator() throws IOException

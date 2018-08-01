@@ -95,6 +95,8 @@ public class Main {
 				serverList.get(i).showPreference();
 			}
 		}
+		
+		// Algo 4 and algo 5 is for capacitated house allocation problem. 5 is more accurate, so 4 can be omitted.
 		else if(algo > 3)
 		{
 			for(int i = 0; i < serverList.size(); i++)
@@ -129,7 +131,8 @@ public class Main {
 			case 3:	
 				WithoutOutsourcing(ueList, serverList);
 				break;
-				
+			
+			// Case 4 and 5 are the same, except the preference function is different, as defined above.	
 			case 4:
 				deferredAcceptanceAlgorithm(ueList, serverList);
 				break;
