@@ -68,6 +68,9 @@ For Main.java, it will run approximately 1 hour to complete.
 For Main2.java, it will run approximately 6~7 hours to complete.
 
 It is recommend not to download the data from my online drive, since these codes can generate similar files.
+
+The online data is here: https://drive.google.com/open?id=1dJth_8CF535q8hCZRty3w8rNaS-zRkc4
+
 If you want to download, the online files include the input, output, and performance files, so that you can directly run the "ShowFigure.java" and "ShowFigure2.java" programs.
 
 ------
