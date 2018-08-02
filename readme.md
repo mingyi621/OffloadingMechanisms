@@ -13,16 +13,16 @@ There are several files to process the mechanisms.
 	
 	In this code, the many-to-one matching algorithms without monetary exchange are implemented. The names of the four algorithm are as follows.
 
-	(a.) deferred acceptance algorithm: This is the Intra-EFS offloading mechanism which is mentioned in the thesis.
-	(b.) Random algorithm: Which is just an random algorithm.
-	(c.) Boston mechanism: Which is another mechanism that is available to compare with the Intra-EFS offloading mechanism.
-	(d.) Without intra-EFS offloading: Only the nearest server can serve the request
+	+ deferred acceptance algorithm: This is the Intra-EFS offloading mechanism which is mentioned in the thesis.
+	+ Random algorithm: Which is just an random algorithm.
+	+ Boston mechanism: Which is another mechanism that is available to compare with the Intra-EFS offloading mechanism.
+	+ Without intra-EFS offloading: Only the nearest server can serve the request
 
 	Due to the different definition of the preference function, the result will be different. So there is a block that can change the preference function. For interested reader, please check the code.
 
 3. Main2.java
 	
-	In this code, the many-to-one matching algorithms without monetary exchange are implemented. The four functions are similar to the above code, except there is an epsilon value be added.
+	In this code, the many-to-one matching algorithms with monetary exchange are implemented. The four functions are similar to the above code, except there is an epsilon value be added.
 
 4. PerformanceEvaluation.java & PerformanceEvaluation2.java
 
@@ -52,7 +52,23 @@ There are several files to process the mechanisms.
 
 	ChartToPS.java
 	HelloBarChart.java
-	XYLineAndShapeRendererDemo.java
+	XYLineAndShapeRendererDemo.java // For generating the first figure.
+
+------
+
+If you want to run the codes and generate the figures, please run by the following procedures:
+
+	For intra-EFS offloading:
+	DataGenerator.java --> Main.java --> PerformanceEvaluation.java --> ShowFigure.java 
+
+	For inter-EFS offloading:
+	DataGenerator.java --> Main2.java --> PerformanceEvaluation2.java --> ShowFigure2.java
+
+For Main.java, it will run approximately 1 hour to complete.
+For Main2.java, it will run approximately 6~7 hours to complete.
+
+It is recommend not to download the data from my online drive, since these codes can generate similar files.
+If you want to download, the online files include the input, output, and performance files, so that you can directly run the "ShowFigure.java" and "ShowFigure2.java" programs.
 
 ------
 
