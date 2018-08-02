@@ -20,7 +20,7 @@ public class PerformanceEvaluation2
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 1;
+		int numberOfSetForEachUE = 100;
 		
 		for(int algo = 0; algo <= 2; algo++)
 		{
@@ -368,25 +368,7 @@ public class PerformanceEvaluation2
 	public static void performanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
 		String outputDirectory = "performance/" + "inter/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + ".csv";		
@@ -414,25 +396,7 @@ public class PerformanceEvaluation2
 	public static void barChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
 		String outputDirectory = "performance/" + "inter/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "BarChart"+ ".csv";		
@@ -460,25 +424,7 @@ public class PerformanceEvaluation2
 	public static void latencyBarChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
 		String outputDirectory = "performance/" + "inter" + "/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "LatencyBarChart"+ ".csv";		

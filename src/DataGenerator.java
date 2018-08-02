@@ -23,7 +23,7 @@ public class DataGenerator
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 1;
+		int numberOfSetForEachUE = 100;
 
 		for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 		{
@@ -365,7 +365,7 @@ public class DataGenerator
 		
 		return distance;
 	}
-	public static List<int[]> generateLatencyListWithClusterAndLocality(int UE, int server, double[] area)
+	public static List<int[]> generateLatencyListWithClusterAndLocality(int UE, int server, double[] area) throws IOException
 	{
 		int localityLatency = 1;
 		double servedRadius = area[0] / (Math.sqrt(Math.sqrt(server)) * 2);
@@ -436,6 +436,7 @@ public class DataGenerator
 			distance.add(row);			
 		}
 //		XYLineAndShapeRendererDemo.showRenderer(UECoordinate, serverCoordinate);
+//		outputCoordinateFile(UECoordinate, serverCoordinate);
 		return distance;
 	}	
 	public static void writeToLatencyFile(String outputFile, List<int[]> latencyList) throws IOException
@@ -461,5 +462,22 @@ public class DataGenerator
 		
 		bw.flush();
 		bw.close();
+	}	
+	public static void outputCoordinateFile(List<Point2D> UECoordinate, List<Point2D> serverCoordinate) throws IOException
+	{
+		FileWriter fw = new FileWriter("coordinate.csv");
+		fw.write("server\n");
+		for(int i = 0; i < serverCoordinate.size(); i++)
+		{
+			fw.write(serverCoordinate.get(i).getX() + "," + serverCoordinate.get(i).getY() + "\n");
+		}
+		fw.write("UE\n");
+		for(int i = 0; i < UECoordinate.size(); i++)
+		{
+			fw.write(UECoordinate.get(i).getX() + "," + UECoordinate.get(i).getY() + "\n");
+		}
+		fw.flush();
+		fw.close();
+
 	}
 }

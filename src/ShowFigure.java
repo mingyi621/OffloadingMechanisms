@@ -28,7 +28,7 @@ public class ShowFigure extends ApplicationFrame
 
 	public static void main(String[] args) throws IOException
 	{
-		int whichColumnIndex = 10;  // input 2~10 for intra, 5,6,7,11 for inter
+		int whichColumnIndex = 5;  // input 2~10 for intra, 5,6,7,11 for inter
 		int intraOrInter = 0; // intra = 0, inter = 1
 		
 		ShowFigure demo = new ShowFigure(whichColumnIndex, intraOrInter);
@@ -150,7 +150,7 @@ public class ShowFigure extends ApplicationFrame
     				
     				String filePath = "";
     				if(intraOrInter == 0)
-    					filePath = "performance/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
+    					filePath = "performance/" + "intra/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv"; 
     				else if(intraOrInter == 1)
     					filePath = "performance/" + "inter/" + algoString + "/" + "UE" + UE + "-" + "server" + server + ".csv";
     				else;

@@ -52,7 +52,7 @@ public class Main {
 		String inputLatencyPath = "input/" + "latency/" + "UE" + UE + "-" + "server" + server + "/" + "latency" + ordinal +".csv";
 		
 		// Output settings.
-		String outputDirectory = "output/" + algoString + "/" +  "UE" + UE + "-" + "server" + server + "/" ;
+		String outputDirectory = "output/" + "intra/" + algoString + "/" +  "UE" + UE + "-" + "server" + server + "/" ;
 		String outputFile = "output" + ordinal +".csv";	
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);    
@@ -138,7 +138,7 @@ public class Main {
 				break;
 			
 			case 5:
-				BostonMechanism(ueList, serverList);
+				BostonMechanism(ueList, serverList); // This is the Capacitated House Allocation Problem
 				break;
 				
 			default:

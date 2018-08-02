@@ -23,7 +23,7 @@ public class PerformanceEvaluation
 		int serverInterval = 10;
 		int numberOfSetForEachUE = 100;
 		
-		for(int algo = 0; algo <= 3; algo++)
+		for(int algo = 0; algo <= 5; algo++)
 		{
 			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{	
@@ -294,27 +294,9 @@ public class PerformanceEvaluation
 	public static void performanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "intra/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + ".csv";		
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);
@@ -340,27 +322,9 @@ public class PerformanceEvaluation
 	public static void barChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "intra/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "BarChart"+ ".csv";		
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);
@@ -386,27 +350,9 @@ public class PerformanceEvaluation
 	public static void latencyBarChartPerformanceOutputFile(int UE, int server, int algo, double[] averagedPerformanceArray) throws IOException
 	{
 		// Output settings.
-		String algoString;
-		switch(algo)
-		{
-			case 0:
-				algoString = "DA";
-				break;
-			case 1:
-				algoString = "Random";
-				break;
-			case 2:
-				algoString = "Boston";
-				break;
-			case 3:
-				algoString = "WOIntra";
-				break;
-			default:
-				algoString = "--";
-				break;
-		}
+		String algoString = Function.algoNumberToAlgoStream(algo);
 		
-		String outputDirectory = "performance/" + algoString + "/" ;
+		String outputDirectory = "performance/" + "intra/" + algoString + "/" ;
 		String outputFile = "UE" + String.valueOf(UE) + "-" + "server" + String.valueOf(server) + "-" + "LatencyBarChart"+ ".csv";		
 		
 		Function.checkDirectoryWhetherExist(outputDirectory);
@@ -433,7 +379,7 @@ public class PerformanceEvaluation
 	public static List<UE> ueListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
 	{
 		String algoString = Function.algoNumberToAlgoStream(algo);
-		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "UE" + ordinal + ".ue";
+		String inputUEFilePath = "output/" + "intra/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "UE" + ordinal + ".ue";
 
 		FileInputStream fisUE = new FileInputStream(inputUEFilePath);
 		ObjectInputStream oisUE = new ObjectInputStream(fisUE);
@@ -446,7 +392,7 @@ public class PerformanceEvaluation
 	public static List<Server> serverListReader(int UE, int server, int ordinal, int algo) throws IOException, ClassNotFoundException
 	{
 		String algoString = Function.algoNumberToAlgoStream(algo);
-		String inputUEFilePath = "output/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "server" + ordinal + ".server";
+		String inputUEFilePath = "output/" + "intra/" + algoString + "/" + "UE" + UE + "-" + "server" + server + "/" + "server" + ordinal + ".server";
 
 		FileInputStream fisServer = new FileInputStream(inputUEFilePath);
 		ObjectInputStream oisServer = new ObjectInputStream(fisServer);

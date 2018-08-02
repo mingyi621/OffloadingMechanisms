@@ -21,7 +21,7 @@ public class Main2 {
 		int UEInterval = 50;
 		int[] serverRange = { 10, 10 }; // Both inclusion
 		int serverInterval = 10;
-		int numberOfSetForEachUE = 1;
+		int numberOfSetForEachUE = 100;
 		
 		for(int algo = 0; algo <= 2; algo++)
 		{
@@ -84,10 +84,10 @@ public class Main2 {
 			System.arraycopy(ueList.get(i).getAskArray(), 0, bidArray, 0, ueList.get(i).getAskArray().length);
 			
 			/** if the first bid is set from the ask plus epsilon */
-			for(int j = 0; j < bidArray.length; j++)
-			{
-				bidArray[j] += ueList.get(i).getEpsilon(j);
-			}
+//			for(int j = 0; j < bidArray.length; j++)
+//			{
+//				bidArray[j] += ueList.get(i).getEpsilon(j);
+//			}
 			/** If the bid starts from the ask, just comment the above code */
 			
 			ueList.get(i).setBidArray(bidArray);
