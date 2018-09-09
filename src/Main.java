@@ -23,7 +23,7 @@ public class Main {
 		int serverInterval = 10;
 		int numberOfSetForEachUE = 100;
 		
-		for(int algo = 0; algo <= 3; algo++)
+		for(int algo = 0; algo <= 5; algo++)
 		{
 			for(int server = serverRange[0]; server <= serverRange[1]; server = server + serverInterval)
 			{	
